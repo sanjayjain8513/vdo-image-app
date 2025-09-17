@@ -30,24 +30,12 @@ def get_video_info(video_path):
     except subprocess.CalledProcessError:
         return None
 
-def get_compression_settings(level, video_info):
-    """Get compression settings based on level"""
-    defaults = {
-        'lossless': {'crf': 18, 'preset': 'slow', 'use_bitrate': False},
-        'high_quality': {'crf': 20, 'preset': 'medium', 'use_bitrate': False},
-        'balanced': {'bitrate': '4000k', 'maxrate': '6000k', 'bufsize': '8000k', 'preset': 'medium', 'use_bitrate': True},
-        'youtube': {'bitrate': '2000k', 'maxrate': '3000k', 'bufsize': '4000k', 'preset': 'slow', 'use_bitrate': True},
-        'aggressive': {'bitrate': '1500k', 'maxrate': '2250k', 'bufsize': '3000k', 'preset': 'slow', 'use_bitrate': True},
-        'maximum': {'bitrate': '1000k', 'maxrate': '1500k', 'bufsize': '2000k', 'preset': 'slow', 'use_bitrate': True}
-    }
-    return defaults.get(level, defaults['balanced'])
-  
 def extract_original_timestamps(video_path):
-    """Extract original video creation timestamp from metadata - corrected version"""
+    """Extract original video creation timestamp from metadata - working version from app_latest.py"""
     timestamps = {'modified': None, 'accessed': None, 'source': 'filesystem'}
     
     try:
-        # First try ffprobe for video metadata creation time
+        # Try to get creation time from video metadata
         cmd = ['ffprobe', '-v', 'quiet', '-select_streams', 'v:0', 
                '-show_entries', 'format_tags=creation_time,date', 
                '-of', 'csv=p=0', video_path]
@@ -82,8 +70,9 @@ def extract_original_timestamps(video_path):
     return timestamps
 
 def create_zip_with_timestamps(file_path, original_timestamps):
-    """Create ZIP with preserved timestamps - corrected version"""
+    """Create a ZIP file containing the video with preserved timestamps - from app_latest.py"""
     try:
+        # Create zip filename
         base_path = os.path.splitext(file_path)[0]
         zip_path = base_path + '.zip'
         
@@ -95,60 +84,155 @@ def create_zip_with_timestamps(file_path, original_timestamps):
             ))
         
         with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED, compresslevel=1) as zf:
+            # Get the original filename without path
             filename = os.path.basename(file_path)
+            
+            # Add file to ZIP
             zf.write(file_path, filename)
             
-            # Set timestamp in ZIP directory
+            # Get file info and set timestamp
             zip_info = zf.getinfo(filename)
             if original_timestamps.get('modified'):
+                # Convert timestamp to ZIP format (year, month, day, hour, minute, second)
                 dt = datetime.fromtimestamp(original_timestamps['modified'])
                 zip_info.date_time = (dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second)
         
         # Set ZIP file timestamps to match original
         if original_timestamps.get('modified'):
-            os.utime(zip_path, (
-                original_timestamps.get('accessed', original_timestamps['modified']), 
-                original_timestamps['modified']
-            ))
-            
-            # Verify ZIP file timestamp
-            zip_stat = os.stat(zip_path)
-            print(f"DEBUG: ZIP timestamp set to: {datetime.fromtimestamp(zip_stat.st_mtime)}")
+            os.utime(zip_path, (original_timestamps.get('accessed', original_timestamps['modified']), original_timestamps['modified']))
         
         return zip_path
     except Exception as e:
-        print(f"ERROR: Failed to create ZIP with timestamps: {e}")
+        print(f"Failed to create ZIP: {e}")
         return None
 
-def preserve_timestamps(file_path, original_timestamps):
-    """Preserve timestamps on file - corrected version"""
-    if not original_timestamps.get('modified'):
-        print("DEBUG: No timestamp to preserve")
-        return False
+def get_compression_settings(level, video_info):
+    """Get compression settings based on level and video analysis - from app_latest.py"""
+    if not video_info or 'streams' not in video_info:
+        return get_default_settings(level)
+    
+    video_stream = None
+    for stream in video_info['streams']:
+        if stream['codec_type'] == 'video':
+            video_stream = stream
+            break
+    
+    if not video_stream:
+        return get_default_settings(level)
+    
+    width = int(video_stream.get('width', 1920))
+    height = int(video_stream.get('height', 1080))
+    current_bitrate = int(video_stream.get('bit_rate', 0)) if video_stream.get('bit_rate') else 0
+    
+    # Calculate pixels for resolution-based settings
+    pixels = width * height
+    
+    settings = {}
+    
+    if level == 'lossless':
+        settings = {
+            'crf': 18 if pixels >= 1920*1080 else 16,
+            'preset': 'slow',
+            'use_bitrate': False,
+            'fps_limit': None
+        }
+    
+    elif level == 'high_quality':
+        settings = {
+            'crf': 20 if pixels >= 1920*1080 else 18,
+            'preset': 'medium',
+            'use_bitrate': False,
+            'fps_limit': None
+        }
+    
+    elif level == 'balanced':
+        if pixels >= 3840 * 2160:
+            settings = {'bitrate': '12000k', 'maxrate': '18000k', 'bufsize': '24000k', 'crf': 22}
+        elif pixels >= 2560 * 1440:
+            settings = {'bitrate': '6000k', 'maxrate': '9000k', 'bufsize': '12000k', 'crf': 21}
+        elif pixels >= 1920 * 1080:
+            settings = {'bitrate': '4000k', 'maxrate': '6000k', 'bufsize': '8000k', 'crf': 20}
+        elif pixels >= 1280 * 720:
+            settings = {'bitrate': '2000k', 'maxrate': '3000k', 'bufsize': '4000k', 'crf': 19}
+        else:
+            settings = {'bitrate': '1000k', 'maxrate': '1500k', 'bufsize': '2000k', 'crf': 18}
         
-    try:
-        # Set file timestamps
-        os.utime(file_path, (
-            original_timestamps.get('accessed', original_timestamps['modified']), 
-            original_timestamps['modified']
-        ))
+        settings.update({
+            'preset': 'medium',
+            'use_bitrate': True,
+            'fps_limit': None
+        })
+    
+    elif level == 'youtube':
+        if pixels >= 3840 * 2160:
+            settings = {'bitrate': '8000k', 'maxrate': '12000k', 'bufsize': '16000k', 'crf': 24}
+        elif pixels >= 2560 * 1440:
+            settings = {'bitrate': '4000k', 'maxrate': '6000k', 'bufsize': '8000k', 'crf': 22}
+        elif pixels >= 1920 * 1080:
+            settings = {'bitrate': '2000k', 'maxrate': '3000k', 'bufsize': '4000k', 'crf': 21}
+        elif pixels >= 1280 * 720:
+            settings = {'bitrate': '1000k', 'maxrate': '1500k', 'bufsize': '2000k', 'crf': 20}
+        else:
+            settings = {'bitrate': '500k', 'maxrate': '750k', 'bufsize': '1000k', 'crf': 19}
         
-        # Verify the timestamp was actually set
-        stat_info = os.stat(file_path)
-        actual_time = datetime.fromtimestamp(stat_info.st_mtime)
-        expected_time = datetime.fromtimestamp(original_timestamps['modified'])
+        settings.update({
+            'preset': 'slow',
+            'use_bitrate': True,
+            'fps_limit': 30
+        })
+    
+    elif level == 'aggressive':
+        if pixels >= 3840 * 2160:
+            settings = {'bitrate': '6000k', 'maxrate': '9000k', 'bufsize': '12000k', 'crf': 26}
+        elif pixels >= 2560 * 1440:
+            settings = {'bitrate': '3000k', 'maxrate': '4500k', 'bufsize': '6000k', 'crf': 24}
+        elif pixels >= 1920 * 1080:
+            settings = {'bitrate': '1500k', 'maxrate': '2250k', 'bufsize': '3000k', 'crf': 23}
+        elif pixels >= 1280 * 720:
+            settings = {'bitrate': '800k', 'maxrate': '1200k', 'bufsize': '1600k', 'crf': 22}
+        else:
+            settings = {'bitrate': '400k', 'maxrate': '600k', 'bufsize': '800k', 'crf': 21}
         
-        print(f"DEBUG: Expected: {expected_time}, Actual: {actual_time}")
+        settings.update({
+            'preset': 'slow',
+            'use_bitrate': True,
+            'fps_limit': 30
+        })
+    
+    elif level == 'maximum':
+        if pixels >= 3840 * 2160:
+            settings = {'bitrate': '4000k', 'maxrate': '6000k', 'bufsize': '8000k', 'crf': 28}
+        elif pixels >= 2560 * 1440:
+            settings = {'bitrate': '2000k', 'maxrate': '3000k', 'bufsize': '4000k', 'crf': 26}
+        elif pixels >= 1920 * 1080:
+            settings = {'bitrate': '1000k', 'maxrate': '1500k', 'bufsize': '2000k', 'crf': 25}
+        elif pixels >= 1280 * 720:
+            settings = {'bitrate': '600k', 'maxrate': '900k', 'bufsize': '1200k', 'crf': 24}
+        else:
+            settings = {'bitrate': '300k', 'maxrate': '450k', 'bufsize': '600k', 'crf': 23}
         
-        # Check if timestamps match (within 2 seconds tolerance)
-        return abs(stat_info.st_mtime - original_timestamps['modified']) < 2
-        
-    except Exception as e:
-        print(f"ERROR: Failed to preserve timestamps: {e}")
-        return False
+        settings.update({
+            'preset': 'slow',
+            'use_bitrate': True,
+            'fps_limit': 30
+        })
+    
+    return settings
+
+def get_default_settings(level):
+    """Default settings when video analysis fails - from app_latest.py"""
+    defaults = {
+        'lossless': {'crf': 18, 'preset': 'slow', 'use_bitrate': False, 'fps_limit': None},
+        'high_quality': {'crf': 20, 'preset': 'medium', 'use_bitrate': False, 'fps_limit': None},
+        'balanced': {'bitrate': '4000k', 'maxrate': '6000k', 'bufsize': '8000k', 'crf': 20, 'preset': 'medium', 'use_bitrate': True, 'fps_limit': None},
+        'youtube': {'bitrate': '2000k', 'maxrate': '3000k', 'bufsize': '4000k', 'crf': 21, 'preset': 'slow', 'use_bitrate': True, 'fps_limit': 30},
+        'aggressive': {'bitrate': '1500k', 'maxrate': '2250k', 'bufsize': '3000k', 'crf': 23, 'preset': 'slow', 'use_bitrate': True, 'fps_limit': 30},
+        'maximum': {'bitrate': '1000k', 'maxrate': '1500k', 'bufsize': '2000k', 'crf': 25, 'preset': 'slow', 'use_bitrate': True, 'fps_limit': 30}
+    }
+    return defaults.get(level, defaults['balanced'])
 
 def should_skip_compression(video_info, original_size, level):
-    """Determine if compression should be skipped for already optimized files"""
+    """Determine if compression should be skipped for lossless/high_quality levels - from app_latest.py"""
     if level not in ['lossless', 'high_quality']:
         return False, "Processing with compression"
     
@@ -187,9 +271,9 @@ def should_skip_compression(video_info, original_size, level):
             return True, f"Already efficiently compressed ({current_bitrate//1000}kbps)"
     
     return False, f"Will compress to optimize quality/size ratio"
-    
+
 def compress_video(input_path, output_path, job_id, file_index, compression_settings, original_filename):
-    """Video compression function with timestamp preservation"""
+    """Video compression with timestamp preservation - from app_latest.py"""
     try:
         if not os.path.exists(input_path):
             raise Exception(f"Input file does not exist: {input_path}")
@@ -200,13 +284,13 @@ def compress_video(input_path, output_path, job_id, file_index, compression_sett
         compression_jobs[job_id]['files'][file_index]['progress'] = 5
         compression_jobs[job_id]['files'][file_index]['output_path'] = output_path
         
-        # Extract original timestamps before processing
+        # Extract original timestamps - this is the key step
         original_timestamps = extract_original_timestamps(input_path)
         
+        video_info = get_video_info(input_path)
         original_size = os.path.getsize(input_path)
         compression_jobs[job_id]['files'][file_index]['original_size'] = original_size
         
-        video_info = get_video_info(input_path)
         should_skip, analysis_msg = should_skip_compression(video_info, original_size, compression_settings['level'])
         compression_jobs[job_id]['files'][file_index]['analysis'] = analysis_msg
         
@@ -214,11 +298,19 @@ def compress_video(input_path, output_path, job_id, file_index, compression_sett
             compression_jobs[job_id]['files'][file_index]['status'] = 'skipped'
             compression_jobs[job_id]['files'][file_index]['progress'] = 100
             
-            # Copy original file and preserve timestamps
             shutil.copy2(input_path, output_path)
-            preserve_timestamps(output_path, original_timestamps)
             
-            # Create ZIP with preserved timestamps
+            # Apply original timestamps to output file
+            if original_timestamps.get('modified'):
+                try:
+                    os.utime(output_path, (
+                        original_timestamps.get('accessed', original_timestamps['modified']), 
+                        original_timestamps['modified']
+                    ))
+                    print(f"DEBUG: Applied timestamps to skipped file: {datetime.fromtimestamp(original_timestamps['modified'])}")
+                except Exception as e:
+                    print(f"DEBUG: Failed to apply timestamps to skipped file: {e}")
+            
             zip_path = create_zip_with_timestamps(output_path, original_timestamps)
             if zip_path:
                 compression_jobs[job_id]['files'][file_index]['zip_path'] = zip_path
@@ -228,7 +320,7 @@ def compress_video(input_path, output_path, job_id, file_index, compression_sett
                 'compressed_size': original_size,
                 'compression_ratio': 0,
                 'completed_at': datetime.now().isoformat(),
-                'message': 'File already optimally compressed - kept original with preserved timestamps'
+                'message': 'Compression skipped - file already optimally compressed'
             })
             return
         
@@ -241,10 +333,8 @@ def compress_video(input_path, output_path, job_id, file_index, compression_sett
         
         settings = get_compression_settings(compression_settings['level'], video_info)
         
-        # Build FFmpeg command
         cmd = ['ffmpeg', '-i', input_path, '-y']
         
-        # Try hardware acceleration
         try:
             test_result = subprocess.run(['ffmpeg', '-f', 'lavfi', '-i', 'testsrc=duration=1:size=320x240:rate=1', '-t', '1', '-f', 'null', '-'], 
                                        capture_output=True, stderr=subprocess.DEVNULL, timeout=5)
@@ -253,7 +343,6 @@ def compress_video(input_path, output_path, job_id, file_index, compression_sett
         except:
             pass
         
-        # Video codec settings
         if compression_settings['codec'] == 'h264':
             cmd.extend([
                 '-c:v', 'libx264',
@@ -272,6 +361,9 @@ def compress_video(input_path, output_path, job_id, file_index, compression_sett
                     cmd.extend(['-crf', str(settings['crf'])])
             else:
                 cmd.extend(['-crf', str(settings['crf'])])
+            
+            if settings['preset'] not in ['ultrafast', 'superfast']:
+                cmd.extend(['-tune', 'film'])
             
             cmd.extend(['-movflags', '+faststart'])
                 
@@ -294,14 +386,38 @@ def compress_video(input_path, output_path, job_id, file_index, compression_sett
                 cmd.extend(['-crf', str(settings['crf'])])
             
             cmd.extend(['-movflags', '+faststart'])
+            
+        elif compression_settings['codec'] == 'vp9':
+            cmd.extend([
+                '-c:v', 'libvpx-vp9',
+                '-row-mt', '1'
+            ])
+            
+            if settings.get('use_bitrate'):
+                cmd.extend([
+                    '-b:v', settings['bitrate'],
+                    '-maxrate', settings['maxrate'],
+                    '-bufsize', settings['bufsize']
+                ])
+            else:
+                cmd.extend(['-crf', str(settings.get('crf', 20)), '-b:v', '0'])
         
-        # Audio settings
+        if settings.get('fps_limit'):
+            cmd.extend(['-r', str(settings['fps_limit'])])
+        
+        if video_info and 'streams' in video_info:
+            for stream in video_info['streams']:
+                if stream['codec_type'] == 'video':
+                    height = int(stream.get('height', 1080))
+                    if height > 1080 and compression_settings['level'] in ['youtube', 'aggressive', 'maximum']:
+                        cmd.extend(['-vf', 'scale=-2:1080'])
+                    break
+        
         if compression_settings['level'] in ['lossless', 'high_quality']:
             cmd.extend(['-c:a', 'aac', '-b:a', '128k'])
         else:
             cmd.extend(['-c:a', 'aac', '-b:a', '96k', '-ac', '2'])
         
-        # Threading and error handling
         cmd.extend([
             '-threads', str(min(os.cpu_count() or 4, 8)),
             '-err_detect', 'ignore_err'
@@ -309,14 +425,12 @@ def compress_video(input_path, output_path, job_id, file_index, compression_sett
         
         cmd.append(output_path)
         
-        # Run FFmpeg with progress tracking
         process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, universal_newlines=True)
         
         for line in iter(process.stdout.readline, ''):
             if line.strip() == '':
                 continue
                 
-            # Parse duration if not already found
             if 'Duration:' in line and duration is None:
                 try:
                     duration_str = line.split('Duration: ')[1].split(',')[0]
@@ -325,7 +439,6 @@ def compress_video(input_path, output_path, job_id, file_index, compression_sett
                 except Exception:
                     pass
             
-            # Parse progress
             if 'time=' in line and duration and duration > 0:
                 try:
                     time_str = line.split('time=')[1].split()[0]
@@ -333,19 +446,15 @@ def compress_video(input_path, output_path, job_id, file_index, compression_sett
                     current_time = int(h) * 3600 + int(m) * 60 + float(s)
                     progress = min(90, int(10 + (current_time / duration) * 80))
                     compression_jobs[job_id]['files'][file_index]['progress'] = progress
-                    compression_jobs[job_id]['files'][file_index]['analysis'] = f'Processing... {progress}% complete'
                 except:
                     pass
         
         return_code = process.wait()
         
-        # In the compress_video function, replace this section:
-
         if return_code == 0 and os.path.exists(output_path):
             time.sleep(1.0)
             compressed_size = os.path.getsize(output_path)
             
-            # Check if compression actually helped
             if compressed_size >= original_size and compression_settings['level'] not in ['lossless', 'high_quality']:
                 try:
                     os.remove(output_path)
@@ -353,7 +462,6 @@ def compress_video(input_path, output_path, job_id, file_index, compression_sett
                 except Exception:
                     pass
                 
-                # Keep original file instead
                 shutil.copy2(input_path, output_path)
                 compressed_size = original_size
                 compression_ratio = 0
@@ -362,17 +470,21 @@ def compress_video(input_path, output_path, job_id, file_index, compression_sett
                 compression_ratio = ((original_size - compressed_size) / original_size) * 100
                 message = "Compression completed successfully"
             
-            # CRITICAL: Apply timestamps to video file FIRST
-            print(f"DEBUG: Applying timestamps to {output_path}")
-            timestamp_success = preserve_timestamps(output_path, original_timestamps)
-            print(f"DEBUG: Timestamp preservation result: {timestamp_success}")
+            # Apply original timestamps to compressed file
+            if original_timestamps.get('modified'):
+                try:
+                    os.utime(output_path, (
+                        original_timestamps.get('accessed', original_timestamps['modified']), 
+                        original_timestamps['modified']
+                    ))
+                    print(f"DEBUG: Applied timestamps to compressed file: {datetime.fromtimestamp(original_timestamps['modified'])}")
+                except Exception as e:
+                    print(f"DEBUG: Failed to apply timestamps to compressed file: {e}")
             
-            # THEN create ZIP with preserved timestamps
             zip_path = create_zip_with_timestamps(output_path, original_timestamps)
             if zip_path:
                 compression_jobs[job_id]['files'][file_index]['zip_path'] = zip_path
                 compression_jobs[job_id]['files'][file_index]['zip_filename'] = os.path.basename(zip_path)
-                print(f"DEBUG: Created ZIP with timestamps: {zip_path}")
             
             compression_jobs[job_id]['files'][file_index].update({
                 'status': 'completed',
@@ -380,8 +492,7 @@ def compress_video(input_path, output_path, job_id, file_index, compression_sett
                 'compressed_size': compressed_size,
                 'compression_ratio': round(compression_ratio, 2),
                 'completed_at': datetime.now().isoformat(),
-                'message': message + (", timestamps preserved" if timestamp_success else ", timestamp preservation failed"),
-                'analysis': f'Completed - {compression_ratio:.1f}% size reduction' + (", timestamps preserved" if timestamp_success else "")
+                'message': message
             })
         else:
             error_msg = f"FFmpeg process failed with return code {return_code}"
@@ -398,16 +509,25 @@ def compress_video(input_path, output_path, job_id, file_index, compression_sett
             'completed_at': datetime.now().isoformat()
         })
 
-def process_video_batch(job_id, compression_settings):
-    """Process video batch in background thread"""
+def process_batch(job_id, compression_settings):
+    """Process video batch - from app_latest.py"""
     try:
+        if job_id not in compression_jobs:
+            return
+            
         job = compression_jobs[job_id]
+        
         for i, file_info in enumerate(job['files']):
             if file_info['status'] == 'queued':
-                compress_video(file_info['input_path'], file_info['output_path'], 
-                             job_id, i, compression_settings, file_info['filename'])
+                try:
+                    compress_video(file_info['input_path'], file_info['output_path'], job_id, i, compression_settings, file_info['filename'])
+                except Exception as e:
+                    compression_jobs[job_id]['files'][i].update({
+                        'status': 'failed',
+                        'error': f"Processing failed: {str(e)}",
+                        'completed_at': datetime.now().isoformat()
+                    })
         
-        # Update job status
         all_files = job['files']
         completed_files = [f for f in all_files if f['status'] in ['completed', 'skipped']]
         failed_files = [f for f in all_files if f['status'] == 'failed']
@@ -479,12 +599,14 @@ def register_video_routes(app, limiter):
                 name_without_ext = name_without_ext[:47] + "..."
             output_filename = f"{name_without_ext}_compressed.{file_extension}"
             output_path = os.path.join(VIDEO_OUTPUT_ROOT, f"{job_id}_{i}_{output_filename}")
+            download_url = f"/video/download/{job_id}/{i}"
             
             file_info = {
                 'filename': filename,
                 'input_path': input_path,
                 'output_path': output_path,
                 'output_filename': output_filename,
+                'download_url': download_url,
                 'status': 'queued',
                 'progress': 0,
                 'analysis': 'Waiting to start...',
@@ -504,18 +626,19 @@ def register_video_routes(app, limiter):
             'status': 'processing',
             'created_at': datetime.now().isoformat(),
             'settings': compression_settings,
+            'download_urls': [f['download_url'] for f in job_files],
             'user': session['user']
         }
         
-        # Start processing in background thread
-        thread = threading.Thread(target=process_video_batch, args=(job_id, compression_settings))
+        thread = threading.Thread(target=process_batch, args=(job_id, compression_settings))
         thread.daemon = True
         thread.start()
         
         return jsonify({
             'job_id': job_id,
             'message': f'Successfully uploaded {len(valid_files)} files. Processing started.',
-            'file_count': len(valid_files)
+            'file_count': len(valid_files),
+            'download_urls': compression_jobs[job_id]['download_urls']
         })
     
     @app.route('/video/status/<job_id>')
@@ -531,7 +654,6 @@ def register_video_routes(app, limiter):
         import copy
         job_copy = copy.deepcopy(job)
         
-        # Remove sensitive paths
         for file_info in job_copy['files']:
             file_info.pop('input_path', None)
             file_info.pop('output_path', None)
@@ -616,7 +738,6 @@ def register_video_routes(app, limiter):
         
         job = compression_jobs[job_id]
         
-        # Check if user owns this job or is admin
         if job.get('user') != session['user'] and session.get('role') != 'admin':
             return render_template_string("""
                 <!DOCTYPE html>
