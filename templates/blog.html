@@ -1,0 +1,1112 @@
+{% extends "base.html" %}
+
+{% block title %}Blog: Image Compression, Resizing & Storage Tips | resizeimages.co.in{% endblock %}
+{% block description %}Comprehensive guides on compressing, resizing, watermarking, cropping, rotating, and converting images. Save Google One storage and speed up your site.{% endblock %}
+{% block keywords %}image compression guide, photo resizer tutorial, save google one storage, compress jpg, kompress foto, kompress jpg, watermark images, crop photos, rotate pictures, blur images{% endblock %}
+
+{% block hero %}
+<div class="hero-section text-center">
+  <div class="container">
+     <div class="mb-3">
+      <img src="{{ url_for('static', filename='images/logo.png') }}"
+           alt="resizeimages.co.in logo"
+           height="60"
+           class="mb-3">
+    </div>
+          <h1 class="display-4 fw-bold mb-3">
+      <i class="fas fa-blog fa-lg me-3"></i>Complete Image Tools Guide
+    </h1>
+    <p class="lead mb-4">Master image compression, resizing, watermarking, cropping, rotating and optimization. Learn how to save storage space and improve website performance with professional techniques.</p>
+    <div class="row justify-content-center g-3">
+      <div class="col-md-2 col-6">
+        <div class="card card-feature bg-white bg-opacity-10 border-0 text-white">
+          <div class="card-body text-center py-3">
+            <i class="fas fa-compress fa-2x mb-2"></i>
+            <h6>Compression</h6>
+            <small>Reduce file size</small>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2 col-6">
+        <div class="card card-feature bg-white bg-opacity-10 border-0 text-white">
+          <div class="card-body text-center py-3">
+            <i class="fas fa-expand-arrows-alt fa-2x mb-2"></i>
+            <h6>Resizing</h6>
+            <small>Perfect dimensions</small>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2 col-6">
+        <div class="card card-feature bg-white bg-opacity-10 border-0 text-white">
+          <div class="card-body text-center py-3">
+            <i class="fas fa-signature fa-2x mb-2"></i>
+            <h6>Watermark</h6>
+            <small>Brand protection</small>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2 col-6">
+        <div class="card card-feature bg-white bg-opacity-10 border-0 text-white">
+          <div class="card-body text-center py-3">
+            <i class="fas fa-crop-alt fa-2x mb-2"></i>
+            <h6>Cropping</h6>
+            <small>Focus on details</small>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2 col-6">
+        <div class="card card-feature bg-white bg-opacity-10 border-0 text-white">
+          <div class="card-body text-center py-3">
+            <i class="fas fa-redo fa-2x mb-2"></i>
+            <h6>Rotation</h6>
+            <small>Perfect orientation</small>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-2 col-6">
+        <div class="card card-feature bg-white bg-opacity-10 border-0 text-white">
+          <div class="card-body text-center py-3">
+            <i class="fas fa-cloud fa-2x mb-2"></i>
+            <h6>Storage Tips</h6>
+            <small>Save cloud space</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <!-- Quick Tools Card -->
+    <div class="card shadow-sm mb-4">
+      <div class="card-header bg-primary text-white">
+        <h3 class="card-title mb-0">
+          <i class="fas fa-tools me-2"></i>Complete Image Toolkit - Quick Access
+        </h3>
+      </div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-4 col-6">
+            <a href="/compress" class="btn btn-outline-primary w-100">
+              <i class="fas fa-compress me-2"></i>Compress Images
+            </a>
+          </div>
+          <div class="col-md-4 col-6">
+            <a href="/resize" class="btn btn-outline-info w-100">
+              <i class="fas fa-expand-arrows-alt me-2"></i>Resize Photos
+            </a>
+          </div>
+          <div class="col-md-4 col-6">
+            <a href="/convert" class="btn btn-outline-warning w-100">
+              <i class="fas fa-exchange-alt me-2"></i>Convert Formats
+            </a>
+          </div>
+          <div class="col-md-4 col-6">
+            <a href="/watermark" class="btn btn-outline-info w-100">
+              <i class="fas fa-signature me-2"></i>Add Watermark
+            </a>
+          </div>
+          <div class="col-md-4 col-6">
+            <a href="/crop" class="btn btn-outline-success w-100">
+              <i class="fas fa-crop-alt me-2"></i>Crop Images
+            </a>
+          </div>
+          <div class="col-md-4 col-6">
+            <a href="/rotate" class="btn btn-outline-secondary w-100">
+              <i class="fas fa-redo me-2"></i>Rotate Photos
+            </a>
+          </div>
+		  <div class="col-md-4 col-6">
+            <a href="/merge" class="btn btn-outline-primary w-100">
+              <i class="fas fa-compress me-2"></i>Merge Images
+            </a>
+          </div>
+          <div class="col-md-4 col-6">
+            <a href="/blur" class="btn btn-outline-info w-100">
+              <i class="fas fa-expand-arrows-alt me-2"></i>Blur Photos
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Table of Contents -->
+    <div class="card shadow-sm mb-4">
+      <div class="card-header bg-dark text-white">
+        <h4 class="card-title mb-0">
+          <i class="fas fa-list me-2"></i>Complete Guide Contents
+        </h4>
+      </div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <ul class="list-unstyled mb-0">
+              <li class="mb-2"><a href="#storage-guide" class="text-decoration-none"><i class="fas fa-cloud me-2"></i>Save Google One Storage</a></li>
+              <li class="mb-2"><a href="#compression-guide" class="text-decoration-none"><i class="fas fa-eye me-2"></i>Lossless Compression</a></li>
+              <li class="mb-2"><a href="#platform-guide" class="text-decoration-none"><i class="fas fa-mobile-alt me-2"></i>Platform Optimization</a></li>
+              <li class="mb-2"><a href="#watermark-guide" class="text-decoration-none"><i class="fas fa-signature me-2"></i>Professional Watermarking</a></li>
+            </ul>
+          </div>
+          <div class="col-md-6">
+            <ul class="list-unstyled mb-0">
+              <li class="mb-2"><a href="#crop-guide" class="text-decoration-none"><i class="fas fa-crop-alt me-2"></i>Smart Cropping Techniques</a></li>
+              <li class="mb-2"><a href="#rotate-guide" class="text-decoration-none"><i class="fas fa-redo me-2"></i>Image Rotation & Orientation</a></li>
+              <li class="mb-2"><a href="#blur-guide" class="text-decoration-none"><i class="fas fa-adjust me-2"></i>Blur Effects & Privacy</a></li>
+              <li class="mb-2"><a href="#batch-guide" class="text-decoration-none"><i class="fas fa-layer-group me-2"></i>Batch Processing Tips</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Article 1 - Storage -->
+    <div class="card shadow-sm mb-4" id="storage-guide">
+      <div class="card-header bg-success text-white">
+        <h3 class="card-title mb-0">
+          <i class="fas fa-cloud me-2"></i>Save Google One Storage by Compressing & Resizing Photos
+        </h3>
+      </div>
+      <div class="card-body">
+        <div class="mb-3 text-muted">
+          <small><i class="fas fa-calendar me-1"></i>Published on January 15, 2025</small>
+          <span class="badge bg-success ms-2">Storage Tips</span>
+        </div>
+
+        <p class="lead">Google Photos is convenient, but free storage fills fast. Large photos (3–10&nbsp;MB) quickly consume your quota. Using our <a href="/" class="text-decoration-none">image compressor</a> and <a href="/resize" class="text-decoration-none">photo resizer</a>, you can often reduce file size by 40–80% with no visible quality loss, keeping more within the free plan.</p>
+
+        <div class="card bg-light mb-3">
+          <div class="card-body">
+            <h5 class="card-title">Why it works</h5>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="d-flex align-items-start">
+                  <i class="fas fa-compress text-primary me-2 mt-1"></i>
+                  <div>
+                    <strong>Compression:</strong> Advanced algorithms preserve visual quality with fewer bytes using smart encoding techniques.
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="d-flex align-items-start">
+                  <i class="fas fa-expand-arrows-alt text-info me-2 mt-1"></i>
+                  <div>
+                    <strong>Resizing:</strong> Reducing dimensions (e.g., 50%) dramatically cuts file size for web and social media sharing.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card bg-light mb-3">
+          <div class="card-body">
+            <h5 class="card-title">Storage Optimization Strategy</h5>
+            <div class="row g-3">
+              <div class="col-md-8">
+                <ol class="mb-0">
+                  <li class="mb-2">Compress before uploading to Google Photos or any cloud service.</li>
+                  <li class="mb-2">Resize large originals to common widths (1280px or 1920px for sharing).</li>
+                  <li class="mb-2">Batch process up to 10 images per run for maximum efficiency.</li>
+                  <li class="mb-2">Consider converting to WebP format for even smaller file sizes.</li>
+                </ol>
+              </div>
+              <div class="col-md-4">
+                <div class="text-center">
+                  <div class="btn-group-vertical w-100">
+                    <a href="/" class="btn btn-primary btn-sm">Try Compression</a>
+                    <a href="/resize" class="btn btn-outline-primary btn-sm">Try Resizing</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-muted">
+          <small>
+            <strong>Keywords:</strong> image resizer, photo resizer, compress jpg, kompress foto, kompress jpg, google photos storage, cloud storage optimization
+          </small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Article 2 - Compression -->
+    <div class="card shadow-sm mb-4" id="compression-guide">
+      <div class="card-header bg-info text-white">
+        <h3 class="card-title mb-0">
+          <i class="fas fa-eye me-2"></i>Lossless-Looking Compression: What It Means
+        </h3>
+      </div>
+      <div class="card-body">
+        <div class="mb-3 text-muted">
+          <small><i class="fas fa-calendar me-1"></i>Published on January 12, 2025</small>
+          <span class="badge bg-info ms-2">Technical Guide</span>
+        </div>
+
+        <p>We say "without loss in <em>visible</em> quality" because modern encoders can reduce bytes while keeping images looking identical to the human eye. This is achieved through sophisticated algorithms that remove imperceptible data.</p>
+
+        <div class="alert alert-info" role="alert">
+          <h6 class="alert-heading"><i class="fas fa-lightbulb me-1"></i>Pro Tip</h6>
+          <p class="mb-0">For archival or professional printing, keep originals. For sharing and web use, compressed results are usually indistinguishable from the source.</p>
+        </div>
+
+        <div class="card bg-light mb-3">
+          <div class="card-body">
+            <h5 class="card-title">Compression Levels by Use Case</h5>
+            <div class="table-responsive">
+              <table class="table table-hover mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>Use Case</th>
+                    <th>Recommended Quality</th>
+                    <th>Expected Size Reduction</th>
+                    <th>Best Tool</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><i class="fas fa-share-alt text-primary me-1"></i>Social Media</td>
+                    <td><span class="badge bg-secondary">75-85%</span></td>
+                    <td><span class="badge bg-success">60-80%</span></td>
+                    <td><a href="/" class="btn btn-sm btn-outline-primary">Compress</a></td>
+                  </tr>
+                  <tr>
+                    <td><i class="fas fa-globe text-info me-1"></i>Website Images</td>
+                    <td><span class="badge bg-secondary">80-90%</span></td>
+                    <td><span class="badge bg-success">40-60%</span></td>
+                    <td><a href="/" class="btn btn-sm btn-outline-primary">Compress</a></td>
+                  </tr>
+                  <tr>
+                    <td><i class="fas fa-envelope text-warning me-1"></i>Email Attachments</td>
+                    <td><span class="badge bg-secondary">70-80%</span></td>
+                    <td><span class="badge bg-success">70-85%</span></td>
+                    <td><a href="/resize" class="btn btn-sm btn-outline-info">Resize + Compress</a></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Article 3 - Platform Optimization -->
+    <div class="card shadow-sm mb-4" id="platform-guide">
+      <div class="card-header bg-warning text-dark">
+        <h3 class="card-title mb-0">
+          <i class="fas fa-mobile-alt me-2"></i>Image Optimization for Different Platforms
+        </h3>
+      </div>
+      <div class="card-body">
+        <div class="mb-3 text-muted">
+          <small><i class="fas fa-calendar me-1"></i>Published on January 10, 2025</small>
+          <span class="badge bg-warning text-dark ms-2">Best Practices</span>
+        </div>
+
+        <p>Different platforms have different requirements and limitations. Here's how to optimize your images for maximum impact across various channels using our complete toolkit.</p>
+
+        <div class="card bg-light mb-3">
+          <div class="card-body">
+            <h5 class="card-title">Platform-Specific Optimization Guide</h5>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="card h-100 border-primary">
+                  <div class="card-header bg-primary text-white">
+                    <h6 class="mb-0"><i class="fas fa-share-alt me-1"></i>Social Media</h6>
+                  </div>
+                  <div class="card-body">
+                    <div class="table-responsive">
+                      <table class="table table-sm mb-2">
+                        <tbody>
+                          <tr>
+                            <td>Instagram Posts:</td>
+                            <td><span class="badge bg-light text-dark">1080x1080px</span></td>
+                          </tr>
+                          <tr>
+                            <td>Instagram Stories:</td>
+                            <td><span class="badge bg-light text-dark">1080x1920px</span></td>
+                          </tr>
+                          <tr>
+                            <td>Facebook Cover:</td>
+                            <td><span class="badge bg-light text-dark">1200x630px</span></td>
+                          </tr>
+                          <tr>
+                            <td>Twitter Header:</td>
+                            <td><span class="badge bg-light text-dark">1500x500px</span></td>
+                          </tr>
+                          <tr>
+                            <td>Size limit:</td>
+                            <td><span class="badge bg-success">Under 1MB</span></td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    <small class="text-muted">💡 Use crop tool for perfect aspect ratios</small>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="card h-100 border-info">
+                  <div class="card-header bg-info text-white">
+                    <h6 class="mb-0"><i class="fas fa-globe me-1"></i>Websites & E-commerce</h6>
+                  </div>
+                  <div class="card-body">
+                    <div class="table-responsive">
+                      <table class="table table-sm mb-2">
+                        <tbody>
+                          <tr>
+                            <td>Hero images:</td>
+                            <td><span class="badge bg-light text-dark">1920x1080px</span></td>
+                          </tr>
+                          <tr>
+                            <td>Product photos:</td>
+                            <td><span class="badge bg-light text-dark">800x800px</span></td>
+                          </tr>
+                          <tr>
+                            <td>Blog thumbnails:</td>
+                            <td><span class="badge bg-light text-dark">600x400px</span></td>
+                          </tr>
+                          <tr>
+                            <td>Logo/Icons:</td>
+                            <td><span class="badge bg-light text-dark">PNG format</span></td>
+                          </tr>
+                          <tr>
+                            <td>Target size:</td>
+                            <td><span class="badge bg-success">100-200KB</span></td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    <small class="text-muted">💡 Add watermarks to protect product images</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Article 4 - Watermarking -->
+    <div class="card shadow-sm mb-4" id="watermark-guide">
+      <div class="card-header bg-purple text-white" style="background-color: #6f42c1;">
+        <h3 class="card-title mb-0">
+          <i class="fas fa-signature me-2"></i>Professional Watermarking: Protect Your Images
+        </h3>
+      </div>
+      <div class="card-body">
+        <div class="mb-3 text-muted">
+          <small><i class="fas fa-calendar me-1"></i>Published on January 8, 2025</small>
+          <span class="badge text-white ms-2" style="background-color: #6f42c1;">Brand Protection</span>
+        </div>
+
+        <p class="lead">Watermarking is essential for photographers, designers, and content creators. Our <a href="/watermark" class="text-decoration-none">watermark tool</a> lets you add text or logo watermarks with transparency control, positioning, and batch processing capabilities.</p>
+
+        <div class="card bg-light mb-3">
+          <div class="card-body">
+            <h5 class="card-title">Why Watermark Your Images?</h5>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="d-flex align-items-start">
+                  <i class="fas fa-shield-alt text-success me-2 mt-1"></i>
+                  <div>
+                    <strong>Copyright Protection:</strong> Establish ownership and prevent unauthorized use of your creative work.
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="d-flex align-items-start">
+                  <i class="fas fa-bullhorn text-info me-2 mt-1"></i>
+                  <div>
+                    <strong>Brand Promotion:</strong> Increase visibility and drive traffic back to your website or portfolio.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card bg-light mb-3">
+          <div class="card-body">
+            <h5 class="card-title">Watermarking Best Practices</h5>
+            <div class="row g-3">
+              <div class="col-md-8">
+                <ul class="mb-0">
+                  <li class="mb-2"><strong>Positioning:</strong> Bottom-right corner for subtle branding, center for maximum protection</li>
+                  <li class="mb-2"><strong>Transparency:</strong> 30-50% opacity maintains image quality while ensuring visibility</li>
+                  <li class="mb-2"><strong>Size:</strong> 10-15% of image width prevents easy removal while staying professional</li>
+                  <li class="mb-2"><strong>Font Choice:</strong> Use clean, readable fonts for text watermarks</li>
+                </ul>
+              </div>
+              <div class="col-md-4">
+                <div class="text-center">
+                  <a href="/watermark" class="btn btn-purple w-100 mb-2 text-white" style="background-color: #6f42c1;">
+                    <i class="fas fa-signature me-1"></i>Add Watermark
+                  </a>
+                  <small class="text-muted">Text & Logo options available</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="alert alert-warning" role="alert">
+          <h6 class="alert-heading"><i class="fas fa-exclamation-triangle me-1"></i>Professional Tip</h6>
+          <p class="mb-0">For portfolio images, use subtle watermarks. For social media, more prominent watermarks help with brand recognition.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Article 5 - Cropping -->
+    <div class="card shadow-sm mb-4" id="crop-guide">
+      <div class="card-header bg-success text-white">
+        <h3 class="card-title mb-0">
+          <i class="fas fa-crop-alt me-2"></i>Smart Cropping Techniques: Focus on What Matters
+        </h3>
+      </div>
+      <div class="card-body">
+        <div class="mb-3 text-muted">
+          <small><i class="fas fa-calendar me-1"></i>Published on January 6, 2025</small>
+          <span class="badge bg-success ms-2">Creative Techniques</span>
+        </div>
+
+        <p>Cropping isn't just about removing unwanted parts—it's about improving composition and creating impactful images. Our <a href="/crop" class="text-decoration-none">crop tool</a> offers preset aspect ratios and freeform cropping for any creative vision.</p>
+
+        <div class="card bg-light mb-3">
+          <div class="card-body">
+            <h5 class="card-title">Popular Aspect Ratios & Their Uses</h5>
+            <div class="table-responsive">
+              <table class="table table-hover mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>Aspect Ratio</th>
+                    <th>Best For</th>
+                    <th>Platform Examples</th>
+                    <th>Visual Impact</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="badge bg-primary">1:1 (Square)</span></td>
+                    <td>Social media posts</td>
+                    <td>Instagram, Facebook posts</td>
+                    <td>Balanced, focused</td>
+                  </tr>
+                  <tr>
+                    <td><span class="badge bg-info">16:9 (Landscape)</span></td>
+                    <td>Website headers, videos</td>
+                    <td>YouTube, website banners</td>
+                    <td>Cinematic, wide</td>
+                  </tr>
+                  <tr>
+                    <td><span class="badge bg-warning">4:5 (Portrait)</span></td>
+                    <td>Instagram posts</td>
+                    <td>Instagram feed</td>
+                    <td>Tall, engaging</td>
+                  </tr>
+                  <tr>
+                    <td><span class="badge bg-success">9:16 (Stories)</span></td>
+                    <td>Vertical content</td>
+                    <td>Instagram Stories, TikTok</td>
+                    <td>Mobile-first</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="card bg-light mb-3">
+          <div class="card-body">
+            <h5 class="card-title">Composition Rules for Better Crops</h5>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="card border-success">
+                  <div class="card-header bg-success bg-opacity-10">
+                    <h6 class="mb-0 text-success"><i class="fas fa-grid-3x3 me-1"></i>Rule of Thirds</h6>
+                  </div>
+                  <div class="card-body">
+                    <small>Place important elements along grid lines or at intersections for more dynamic compositions.</small>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="card border-info">
+                  <div class="card-header bg-info bg-opacity-10">
+                    <h6 class="mb-0 text-info"><i class="fas fa-bullseye me-1"></i>Center Focus</h6>
+                  </div>
+                  <div class="card-body">
+                    <small>For portraits and products, centering creates strong, direct impact and draws immediate attention.</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-center">
+          <a href="/crop" class="btn btn-success">
+            <i class="fas fa-crop-alt me-1"></i>Try Smart Cropping
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Article 6 - Rotation -->
+    <div class="card shadow-sm mb-4" id="rotate-guide">
+      <div class="card-header bg-secondary text-white">
+        <h3 class="card-title mb-0">
+          <i class="fas fa-redo me-2"></i>Image Rotation & Orientation: Get It Right Every Time
+        </h3>
+      </div>
+      <div class="card-body">
+        <div class="mb-3 text-muted">
+          <small><i class="fas fa-calendar me-1"></i>Published on January 4, 2025</small>
+          <span class="badge bg-secondary ms-2">Technical Guide</span>
+        </div>
+
+        <p>Wrong orientation can ruin a great photo. Our <a href="/rotate" class="text-decoration-none">rotation tool</a> offers precise angle adjustment, automatic orientation detection, and quick 90° rotations for perfect results.</p>
+
+        <div class="card bg-light mb-3">
+          <div class="card-body">
+            <h5 class="card-title">Common Rotation Scenarios</h5>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="d-flex align-items-start">
+                  <i class="fas fa-camera text-primary me-2 mt-1"></i>
+                  <div>
+                    <strong>Mobile Photos:</strong> Many phones save images with EXIF orientation data that doesn't display correctly on all platforms.
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="d-flex align-items-start">
+                  <i class="fas fa-level-up-alt text-info me-2 mt-1"></i>
+                  <div>
+                    <strong>Horizon Correction:</strong> Fix slightly tilted landscape photos with precise angle adjustments (-5° to +5°).
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card bg-light mb-3">
+          <div class="card-body">
+            <h5 class="card-title">Rotation Options Available</h5>
+            <div class="row g-2">
+              <div class="col-6 col-md-3">
+                <div class="text-center p-2 border rounded">
+                  <i class="fas fa-undo fa-2x text-primary mb-1"></i>
+                  <div><small><strong>90° Left</strong></small></div>
+                </div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="text-center p-2 border rounded">
+                  <i class="fas fa-redo fa-2x text-primary mb-1"></i>
+                  <div><small><strong>90° Right</strong></small></div>
+                </div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="text-center p-2 border rounded">
+                  <i class="fas fa-sync fa-2x text-warning mb-1"></i>
+                  <div><small><strong>180° Flip</strong></small></div>
+                </div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="text-center p-2 border rounded">
+                  <i class="fas fa-sliders-h fa-2x text-info mb-1"></i>
+                  <div><small><strong>Custom Angle</strong></small></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="alert alert-info" role="alert">
+          <h6 class="alert-heading"><i class="fas fa-lightbulb me-1"></i>Pro Tip</h6>
+          <p class="mb-0">Always rotate before cropping to avoid unnecessary quality loss. Our tool maintains maximum image quality during rotation.</p>
+        </div>
+
+        <div class="text-center">
+          <a href="/rotate" class="btn btn-secondary">
+            <i class="fas fa-redo me-1"></i>Rotate Images
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Article 7 - Blur Effects -->
+    <div class="card shadow-sm mb-4" id="blur-guide">
+      <div class="card-header bg-dark text-white">
+        <h3 class="card-title mb-0">
+          <i class="fas fa-adjust me-2"></i>Blur Effects & Privacy: Creative and Protective Uses
+        </h3>
+      </div>
+      <div class="card-body">
+        <div class="mb-3 text-muted">
+          <small><i class="fas fa-calendar me-1"></i>Published on January 2, 2025</small>
+          <span class="badge bg-dark ms-2">Privacy & Creative</span>
+        </div>
+
+        <p>Blur effects serve both creative and practical purposes. Our <a href="/blur" class="text-decoration-none">blur tool</a> offers selective blurring, background blur, and privacy protection features for faces, license plates, and sensitive information.</p>
+
+        <div class="card bg-light mb-3">
+          <div class="card-body">
+            <h5 class="card-title">Blur Applications</h5>
+            <div class="row g-3">
+              <div class="col-md-4">
+                <div class="card h-100 border-primary">
+                  <div class="card-header bg-primary text-white">
+                    <h6 class="mb-0"><i class="fas fa-user-shield me-1"></i>Privacy Protection</h6>
+                  </div>
+                  <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                      <li class="mb-1">• Blur faces in group photos</li>
+                      <li class="mb-1">• Hide license plates</li>
+                      <li class="mb-1">• Obscure personal information</li>
+                      <li class="mb-1">• Protect children's identity</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="card h-100 border-success">
+                  <div class="card-header bg-success text-white">
+                    <h6 class="mb-0"><i class="fas fa-paint-brush me-1"></i>Creative Effects</h6>
+                  </div>
+                  <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                      <li class="mb-1">• Background bokeh effect</li>
+                      <li class="mb-1">• Focus attention on subjects</li>
+                      <li class="mb-1">• Artistic depth of field</li>
+                      <li class="mb-1">• Dreamy, soft aesthetics</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="card h-100 border-warning">
+                  <div class="card-header bg-warning text-dark">
+                    <h6 class="mb-0"><i class="fas fa-business-time me-1"></i>Professional Use</h6>
+                  </div>
+                  <div class="card-body">
+                    <ul class="list-unstyled mb-0">
+                      <li class="mb-1">• Property listing privacy</li>
+                      <li class="mb-1">• Medical image compliance</li>
+                      <li class="mb-1">• Legal document redaction</li>
+                      <li class="mb-1">• Social media safety</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card bg-light mb-3">
+          <div class="card-body">
+            <h5 class="card-title">Blur Intensity Guide</h5>
+            <div class="table-responsive">
+              <table class="table table-hover mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>Blur Level</th>
+                    <th>Use Case</th>
+                    <th>Privacy Level</th>
+                    <th>Aesthetic Impact</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><span class="badge bg-light text-dark">Light (10-20%)</span></td>
+                    <td>Soft background blur</td>
+                    <td><span class="text-muted">Low</span></td>
+                    <td><span class="text-success">Subtle, professional</span></td>
+                  </tr>
+                  <tr>
+                    <td><span class="badge bg-secondary">Medium (30-50%)</span></td>
+                    <td>Face obscuring, creative focus</td>
+                    <td><span class="text-warning">Moderate</span></td>
+                    <td><span class="text-info">Artistic, attention-grabbing</span></td>
+                  </tr>
+                  <tr>
+                    <td><span class="badge bg-dark">Heavy (60-80%)</span></td>
+                    <td>Complete privacy protection</td>
+                    <td><span class="text-success">High</span></td>
+                    <td><span class="text-primary">Strong creative effect</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-center">
+          <a href="/blur" class="btn btn-dark">
+            <i class="fas fa-adjust me-1"></i>Apply Blur Effects
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Article 8 - Batch Processing -->
+    <div class="card shadow-sm mb-4" id="batch-guide">
+      <div class="card-header bg-gradient" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+        <h3 class="card-title mb-0">
+          <i class="fas fa-layer-group me-2"></i>Batch Processing: Efficiency for Multiple Images
+        </h3>
+      </div>
+      <div class="card-body">
+        <div class="mb-3 text-muted">
+          <small><i class="fas fa-calendar me-1"></i>Published on December 30, 2024</small>
+          <span class="badge text-white ms-2" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">Productivity</span>
+        </div>
+
+        <p class="lead">Processing images one by one is time-consuming. All our tools support batch processing up to 10 images simultaneously, letting you compress, resize, watermark, crop, and rotate multiple photos with consistent settings.</p>
+
+        <div class="card bg-light mb-3">
+          <div class="card-body">
+            <h5 class="card-title">Batch Processing Workflow</h5>
+            <div class="row g-3">
+              <div class="col-md-3">
+                <div class="text-center">
+                  <div class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center mb-2" style="width: 50px; height: 50px;">
+                    <strong>1</strong>
+                  </div>
+                  <h6>Upload Multiple</h6>
+                  <small class="text-muted">Select up to 10 images at once</small>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="text-center">
+                  <div class="rounded-circle bg-info text-white d-inline-flex align-items-center justify-content-center mb-2" style="width: 50px; height: 50px;">
+                    <strong>2</strong>
+                  </div>
+                  <h6>Set Parameters</h6>
+                  <small class="text-muted">Choose settings applied to all images</small>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="text-center">
+                  <div class="rounded-circle bg-warning text-dark d-inline-flex align-items-center justify-content-center mb-2" style="width: 50px; height: 50px;">
+                    <strong>3</strong>
+                  </div>
+                  <h6>Process All</h6>
+                  <small class="text-muted">One click processes everything</small>
+                </div>
+              </div>
+              <div class="col-md-3">
+                <div class="text-center">
+                  <div class="rounded-circle bg-success text-white d-inline-flex align-items-center justify-content-center mb-2" style="width: 50px; height: 50px;">
+                    <strong>4</strong>
+                  </div>
+                  <h6>Download ZIP</h6>
+                  <small class="text-muted">Get all processed images together</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card bg-light mb-3">
+          <div class="card-body">
+            <h5 class="card-title">Best Batch Processing Combinations</h5>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="card border-primary">
+                  <div class="card-header bg-primary bg-opacity-10">
+                    <h6 class="mb-0 text-primary"><i class="fas fa-share-alt me-1"></i>Social Media Prep</h6>
+                  </div>
+                  <div class="card-body">
+                    <small>1. Crop to 1:1 aspect ratio<br>2. Resize to 1080x1080px<br>3. Add watermark<br>4. Compress to under 1MB</small>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="card border-success">
+                  <div class="card-header bg-success bg-opacity-10">
+                    <h6 class="mb-0 text-success"><i class="fas fa-cloud me-1"></i>Storage Optimization</h6>
+                  </div>
+                  <div class="card-body">
+                    <small>1. Resize to max 1920px width<br>2. Compress with 85% quality<br>3. Convert to WebP format<br>4. Reduce file size by 70%</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="alert alert-success" role="alert">
+          <h6 class="alert-heading"><i class="fas fa-rocket me-1"></i>Efficiency Tip</h6>
+          <p class="mb-0">Save time by organizing similar images together. Process wedding photos in one batch, product photos in another, each with optimized settings for their intended use.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Enhanced Format Comparison -->
+    <div class="card bg-light mb-4">
+      <div class="card-body">
+        <h5 class="card-title"><i class="fas fa-chart-bar me-2"></i>Complete Image Format Guide</h5>
+        <div class="row g-3">
+          <div class="col-md-3">
+            <div class="text-center">
+              <i class="fas fa-file-image fa-2x text-primary mb-2"></i>
+              <h6>JPG (JPEG)</h6>
+              <small class="text-muted">Best for photographs with many colors. Excellent compression but lossy. Ideal for social media and web.</small>
+              <div class="mt-2">
+                <span class="badge bg-primary">Photos</span>
+                <span class="badge bg-secondary">Web</span>
+              </div>
+              <div class="mt-2">
+                <a href="/convert" class="btn btn-outline-primary btn-sm">Convert to JPG</a>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="text-center">
+              <i class="fas fa-file-image fa-2x text-info mb-2"></i>
+              <h6>PNG</h6>
+              <small class="text-muted">Perfect for graphics, logos, and images with transparency. Lossless but larger files.</small>
+              <div class="mt-2">
+                <span class="badge bg-info">Logos</span>
+                <span class="badge bg-success">Transparency</span>
+              </div>
+              <div class="mt-2">
+                <a href="/convert" class="btn btn-outline-info btn-sm">Convert to PNG</a>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="text-center">
+              <i class="fas fa-file-image fa-2x text-success mb-2"></i>
+              <h6>WebP</h6>
+              <small class="text-muted">Modern format offering 25-30% better compression than JPG while maintaining quality. Great for websites.</small>
+              <div class="mt-2">
+                <span class="badge bg-success">Modern</span>
+                <span class="badge bg-warning">Efficient</span>
+              </div>
+              <div class="mt-2">
+                <a href="/convert" class="btn btn-outline-success btn-sm">Convert to WebP</a>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="text-center">
+              <i class="fas fa-file-image fa-2x text-warning mb-2"></i>
+              <h6>HEIC</h6>
+              <small class="text-muted">Apple's format used by iPhone. Excellent compression but limited compatibility. Convert for universal use.</small>
+              <div class="mt-2">
+                <span class="badge bg-warning">iPhone</span>
+                <span class="badge bg-danger">Limited</span>
+              </div>
+              <div class="mt-2">
+                <a href="/convert" class="btn btn-outline-warning btn-sm">Convert HEIC</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Advanced Tips Section -->
+    <div class="card shadow-sm mb-4">
+      <div class="card-header bg-gradient text-white" style="background: linear-gradient(135deg, #fc466b 0%, #3f5efb 100%);">
+        <h4 class="card-title mb-0">
+          <i class="fas fa-graduation-cap me-2"></i>Advanced Image Optimization Strategies
+        </h4>
+      </div>
+      <div class="card-body">
+        <div class="row g-4">
+          <div class="col-md-6">
+            <h5><i class="fas fa-tachometer-alt text-primary me-2"></i>Website Performance</h5>
+            <ul class="list-unstyled">
+              <li class="mb-2"><i class="fas fa-check-circle text-success me-1"></i> Use WebP format for 30% smaller files</li>
+              <li class="mb-2"><i class="fas fa-check-circle text-success me-1"></i> Lazy load images below the fold</li>
+              <li class="mb-2"><i class="fas fa-check-circle text-success me-1"></i> Serve responsive images with srcset</li>
+              <li class="mb-2"><i class="fas fa-check-circle text-success me-1"></i> Compress to under 100KB for fast loading</li>
+            </ul>
+          </div>
+          <div class="col-md-6">
+            <h5><i class="fas fa-mobile-alt text-info me-2"></i>Mobile Optimization</h5>
+            <ul class="list-unstyled">
+              <li class="mb-2"><i class="fas fa-check-circle text-success me-1"></i> Test images on various screen sizes</li>
+              <li class="mb-2"><i class="fas fa-check-circle text-success me-1"></i> Use square crops for better mobile viewing</li>
+              <li class="mb-2"><i class="fas fa-check-circle text-success me-1"></i> Ensure text in images remains readable</li>
+              <li class="mb-2"><i class="fas fa-check-circle text-success me-1"></i> Optimize for slow connections</li>
+            </ul>
+          </div>
+          <div class="col-md-6">
+            <h5><i class="fas fa-search text-warning me-2"></i>SEO Benefits</h5>
+            <ul class="list-unstyled">
+              <li class="mb-2"><i class="fas fa-check-circle text-success me-1"></i> Smaller images improve page speed rankings</li>
+              <li class="mb-2"><i class="fas fa-check-circle text-success me-1"></i> Proper dimensions prevent layout shifts</li>
+              <li class="mb-2"><i class="fas fa-check-circle text-success me-1"></i> Watermarks can include your domain</li>
+              <li class="mb-2"><i class="fas fa-check-circle text-success me-1"></i> Optimized images reduce bounce rates</li>
+            </ul>
+          </div>
+          <div class="col-md-6">
+            <h5><i class="fas fa-shield-alt text-danger me-2"></i>Security & Privacy</h5>
+            <ul class="list-unstyled">
+              <li class="mb-2"><i class="fas fa-check-circle text-success me-1"></i> Remove EXIF data to protect location privacy</li>
+              <li class="mb-2"><i class="fas fa-check-circle text-success me-1"></i> Blur sensitive information before sharing</li>
+              <li class="mb-2"><i class="fas fa-check-circle text-success me-1"></i> Watermark prevents unauthorized use</li>
+              <li class="mb-2"><i class="fas fa-check-circle text-success me-1"></i> Process images locally in browser</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Reference Card -->
+    <div class="card bg-gradient text-white mb-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+      <div class="card-header border-0">
+        <h4 class="card-title mb-0">
+          <i class="fas fa-bookmark me-2"></i>Quick Reference: When to Use Each Tool
+        </h4>
+      </div>
+      <div class="card-body">
+        <div class="row g-3 text-center">
+          <div class="col-md-4">
+            <div class="bg-white bg-opacity-10 p-3 rounded">
+              <i class="fas fa-compress fa-2x mb-2"></i>
+              <h6>Compress</h6>
+              <small>Reduce file size for faster uploads and storage savings</small>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="bg-white bg-opacity-10 p-3 rounded">
+              <i class="fas fa-expand-arrows-alt fa-2x mb-2"></i>
+              <h6>Resize</h6>
+              <small>Change dimensions for specific platform requirements</small>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="bg-white bg-opacity-10 p-3 rounded">
+              <i class="fas fa-crop-alt fa-2x mb-2"></i>
+              <h6>Crop</h6>
+              <small>Improve composition and remove unwanted areas</small>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="bg-white bg-opacity-10 p-3 rounded">
+              <i class="fas fa-signature fa-2x mb-2"></i>
+              <h6>Watermark</h6>
+              <small>Protect your work and promote your brand</small>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="bg-white bg-opacity-10 p-3 rounded">
+              <i class="fas fa-redo fa-2x mb-2"></i>
+              <h6>Rotate</h6>
+              <small>Fix orientation and straighten tilted photos</small>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="bg-white bg-opacity-10 p-3 rounded">
+              <i class="fas fa-adjust fa-2x mb-2"></i>
+              <h6>Blur</h6>
+              <small>Create artistic effects or protect privacy</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation to Tools -->
+    <div class="card shadow-sm">
+      <div class="card-header bg-secondary text-white">
+        <h4 class="card-title mb-0">
+          <i class="fas fa-rocket me-2"></i>Ready to Optimize Your Images?
+        </h4>
+      </div>
+      <div class="card-body">
+        <p class="lead text-center mb-4">Choose the perfect tool for your image optimization needs. All tools support batch processing and work directly in your browser for maximum privacy and speed.</p>
+
+        <div class="row g-3">
+          <div class="col-md-6 col-lg-4">
+            <div class="card h-100 border-primary">
+              <div class="card-body text-center">
+                <i class="fas fa-compress fa-3x text-primary mb-3"></i>
+                <h5>Compress Images</h5>
+                <p class="text-muted mb-3">Reduce file size by up to 80% without visible quality loss</p>
+                <a href="/" class="btn btn-primary w-100">Start Compressing</a>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-4">
+            <div class="card h-100 border-info">
+              <div class="card-body text-center">
+                <i class="fas fa-expand-arrows-alt fa-3x text-info mb-3"></i>
+                <h5>Resize Photos</h5>
+                <p class="text-muted mb-3">Perfect dimensions for any platform or device</p>
+                <a href="/resize" class="btn btn-info w-100">Start Resizing</a>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-4">
+            <div class="card h-100 border-warning">
+              <div class="card-body text-center">
+                <i class="fas fa-exchange-alt fa-3x text-warning mb-3"></i>
+                <h5>Convert Formats</h5>
+                <p class="text-muted mb-3">Transform between JPG, PNG, WebP, and more</p>
+                <a href="/convert" class="btn btn-warning w-100">Start Converting</a>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-4">
+            <div class="card h-100" style="border-color: #6f42c1;">
+              <div class="card-body text-center">
+                <i class="fas fa-signature fa-3x mb-3" style="color: #6f42c1;"></i>
+                <h5>Add Watermarks</h5>
+                <p class="text-muted mb-3">Brand protection with text and logo watermarks</p>
+                <a href="/watermark" class="btn w-100 text-white" style="background-color: #6f42c1;">Add Watermark</a>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-4">
+            <div class="card h-100 border-success">
+              <div class="card-body text-center">
+                <i class="fas fa-crop-alt fa-3x text-success mb-3"></i>
+                <h5>Crop Images</h5>
+                <p class="text-muted mb-3">Smart cropping with aspect ratio presets</p>
+                <a href="/crop" class="btn btn-success w-100">Start Cropping</a>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-4">
+            <div class="card h-100 border-secondary">
+              <div class="card-body text-center">
+                <i class="fas fa-redo fa-3x text-secondary mb-3"></i>
+                <h5>Rotate Photos</h5>
+                <p class="text-muted mb-3">Fix orientation and straighten your images</p>
+                <a href="/rotate" class="btn btn-secondary w-100">Start Rotating</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-footer text-center bg-light">
+        <div class="row g-2 align-items-center">
+          <div class="col-md-6">
+            <small class="text-muted">
+              <i class="fas fa-shield-alt text-success me-1"></i>
+              <strong>100% Secure:</strong> All processing happens in your browser
+            </small>
+          </div>
+          <div class="col-md-6">
+            <small class="text-muted">
+              <i class="fas fa-bolt text-warning me-1"></i>
+              <strong>Lightning Fast:</strong> No uploads required, instant results
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

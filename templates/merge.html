@@ -1,0 +1,813 @@
+{% extends "base.html" %}
+
+{% block title %}Merge Images Online - Combine JPG, PNG Images | resizeimages.co.in{% endblock %}
+{% block description %}Merge multiple images online into one. Combine images horizontally, vertically, or in a grid layout. Support for JPG, PNG, WebP formats.{% endblock %}
+{% block keywords %}merge images, combine images, join images, image collage, photo grid, merge jpg, combine png{% endblock %}
+
+{% block hero %}
+<div class="hero-section text-center">
+  <div class="container">
+    <div class="mb-3">
+      <img src="{{ url_for('static', filename='images/logo.png') }}"
+           alt="resizeimages.co.in logo"
+           height="60"
+           class="mb-3">
+    </div>
+    <h1 class="display-4 fw-bold mb-3">
+      <i class="fas fa-object-group fa-lg me-3"></i>Merge Images
+    </h1>
+    <p class="lead mb-4">Combine multiple images into one. Create horizontal, vertical, or grid layouts easily.</p>
+    <div class="row justify-content-center">
+      <div class="col-md-3">
+        <div class="card card-feature bg-white bg-opacity-10 border-0 text-white">
+          <div class="card-body text-center">
+            <i class="fas fa-arrows-alt-h fa-2x mb-2"></i>
+            <h6>Horizontal</h6>
+            <p class="mb-0 small">Side by side layout</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card card-feature bg-white bg-opacity-10 border-0 text-white">
+          <div class="card-body text-center">
+            <i class="fas fa-arrows-alt-v fa-2x mb-2"></i>
+            <h6>Vertical</h6>
+            <p class="mb-0 small">Top to bottom layout</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card card-feature bg-white bg-opacity-10 border-0 text-white">
+          <div class="card-body text-center">
+            <i class="fas fa-th fa-2x mb-2"></i>
+            <h6>Grid Layout</h6>
+            <p class="mb-0 small">Custom rows and columns</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card card-feature bg-white bg-opacity-10 border-0 text-white">
+          <div class="card-body text-center">
+            <i class="fas fa-palette fa-2x mb-2"></i>
+            <h6>Custom Style</h6>
+            <p class="mb-0 small">Background and spacing</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card shadow-sm">
+      <div class="card-header bg-success text-white">
+        <h3 class="card-title mb-0">
+          <i class="fas fa-object-group me-2"></i>Image Merge Tool
+        </h3>
+      </div>
+      <div class="card-body">
+        <div class="mb-3 text-muted">
+          <strong>Upload constraints:</strong>
+          Max files: <span class="badge bg-secondary">{{ max_files or 10 }}</span>,
+          Types: <span class="badge bg-secondary">JPG, PNG, WebP</span>,
+          Max size per file: <span class="badge bg-secondary">{{ config_max_mb or 25 }} MB</span>
+        </div>
+
+        <form id="mainForm" action="/merge" method="post" enctype="multipart/form-data">
+          <div id="dropArea" class="dropArea mb-3">
+            <i class="fas fa-cloud-upload-alt fa-3x mb-2 text-muted"></i>
+            <p class="mb-2">Click or drag & drop images here</p>
+            <small class="text-muted">Upload at least 2 images to merge</small>
+          </div>
+          <input type="file" id="fileInput" name="images" accept="image/jpeg,image/jpg,image/png,image/webp" multiple style="display:none">
+
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label">Or paste direct image URLs (one per line):</label>
+              <textarea class="form-control" name="remote_urls" rows="3" placeholder="https://example.com/image1.jpg&#10;https://example.com/image2.jpg"></textarea>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Or Google Drive share links (one per line):</label>
+              <textarea class="form-control" name="drive_urls" rows="3" placeholder="https://drive.google.com/...&#10;https://drive.google.com/..."></textarea>
+            </div>
+          </div>
+
+          <div class="card bg-light mb-3">
+            <div class="card-body">
+              <h5 class="card-title">Merge Options</h5>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label">Layout Mode:</label>
+                  <select class="form-select" name="layout_mode" id="layoutMode" onchange="updateLayoutOptions()">
+                    <option value="horizontal">Horizontal (Side by Side)</option>
+                    <option value="vertical">Vertical (Top to Bottom)</option>
+                    <option value="grid">Grid Layout</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Image Alignment:</label>
+                  <select class="form-select" name="alignment" id="alignment">
+                    <option value="center">Center</option>
+                    <option value="top">Top</option>
+                    <option value="bottom">Bottom</option>
+                    <option value="left">Left</option>
+                    <option value="right">Right</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Grid Options -->
+              <div id="gridOptions" style="display:none;" class="mt-3">
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label class="form-label">Grid Columns:</label>
+                    <select class="form-select" name="grid_columns">
+                      <option value="2">2 Columns</option>
+                      <option value="3" selected>3 Columns</option>
+                      <option value="4">4 Columns</option>
+                      <option value="5">5 Columns</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">Fill Mode:</label>
+                    <select class="form-select" name="grid_fill">
+                      <option value="auto">Auto Fill Rows</option>
+                      <option value="square">Force Square Grid</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row g-3 mt-2">
+                <div class="col-md-4">
+                  <label class="form-label">Spacing (pixels):</label>
+                  <input class="form-control" name="spacing" type="number" value="10" min="0" max="100">
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Background Color:</label>
+                  <div class="input-group">
+                    <input type="color" class="form-control form-control-color" name="bg_color" value="#ffffff">
+                    <input type="text" class="form-control" name="bg_color_hex" value="#ffffff" placeholder="#ffffff">
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Output Quality:</label>
+                  <select class="form-select" name="quality">
+                    <option value="95" selected>High (95%)</option>
+                    <option value="85">Good (85%)</option>
+                    <option value="75">Medium (75%)</option>
+                    <option value="60">Low (60%)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="row g-3 mt-2">
+                <div class="col-md-6">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="resize_to_fit" id="resizeToFit" checked>
+                    <label class="form-check-label" for="resizeToFit">
+                      Resize images to fit uniformly
+                    </label>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="maintain_aspect" id="maintainAspect" checked>
+                    <label class="form-check-label" for="maintainAspect">
+                      Maintain aspect ratio
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Image Preview Section -->
+          <div id="imagePreview" style="display:none;" class="card bg-light mb-3">
+            <div class="card-body">
+              <h5 class="card-title">Image Preview</h5>
+              <div id="imageList" class="d-flex flex-wrap gap-2"></div>
+              <div class="mt-2">
+                <small class="text-muted">
+                  <i class="fas fa-info-circle me-1"></i>
+                  Drag and drop images to reorder them before merging.
+                </small>
+              </div>
+            </div>
+          </div>
+
+          <div id="selectionInfo" class="selection-info mt-3" style="display:none;">
+            <div class="alert alert-info">
+              <strong><span id="fileCount">0</span></strong> file(s) selected for merging
+            </div>
+          </div>
+
+          <div class="text-center mt-4">
+            <button type="submit" class="btn btn-success btn-lg px-5" id="mergeBtn" disabled>
+              <i class="fas fa-object-group me-2"></i>Merge Images
+            </button>
+            <div class="mt-2">
+              <small class="text-muted">Minimum 2 images required</small>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Merge Examples -->
+    <div class="card shadow-sm mt-4">
+      <div class="card-header bg-light">
+        <h5 class="card-title mb-0">
+          <i class="fas fa-images me-2 text-center"></i>Merge Examples & Tips
+        </h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <h6><i class="fas fa-arrows-alt-h me-2 text-primary"></i>Horizontal Merge</h6>
+            <p class="small mb-3">Perfect for before/after comparisons, panoramic views, or creating wide banners.</p>
+
+            <h6><i class="fas fa-arrows-alt-v me-2 text-success"></i>Vertical Merge</h6>
+            <p class="small mb-3">Great for infographics, step-by-step guides, or tall social media posts.</p>
+          </div>
+          <div class="col-md-6">
+            <h6><i class="fas fa-th me-2 text-warning"></i>Grid Layout</h6>
+            <p class="small mb-3">Ideal for photo collages, product catalogs, or Instagram grid previews.</p>
+
+            <h6><i class="fas fa-lightbulb me-2 text-info"></i>Pro Tips</h6>
+            <ul class="small mb-0">
+              <li>Use similar sized images for best results</li>
+              <li>White background works well for most merges</li>
+              <li>Add spacing to separate images clearly</li>
+              <li>Enable "resize to fit" for uniform appearance</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if results %}
+<div class="row justify-content-center mt-4">
+  <div class="col-lg-8">
+    <div class="card shadow-sm">
+      <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+        <h4 class="mb-0">
+          <i class="fas fa-check-circle me-2"></i>Merge Results
+        </h4>
+        {% if all_downloads and all_downloads|length > 0 %}
+        <button id="downloadAll" class="btn btn-light btn-sm">
+          <i class="fas fa-download me-1"></i>Download All
+        </button>
+        {% endif %}
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Merged Image</th>
+                <th>Images Used</th>
+                <th>Dimensions</th>
+                <th>File Size</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for r in results %}
+              <tr>
+                <td>
+                  {% if r.error %}
+                    <i class="fas fa-exclamation-triangle text-danger me-1"></i>{{ r.name }}
+                  {% else %}
+                    <i class="fas fa-object-group text-success me-1"></i>{{ r.name }}
+                  {% endif %}
+                </td>
+                {% if r.error %}
+                <td colspan="4">
+                  <span class="text-danger">Error: {{ r.error }}</span>
+                </td>
+                {% else %}
+                <td>{{ r.images_count }} images</td>
+                <td>{{ r.dimensions }}</td>
+                <td>{{ r.file_size }}</td>
+                <td>
+                  <a href="{{ r.download }}" class="btn btn-outline-success btn-sm" download>
+                    <i class="fas fa-download me-1"></i>Download
+                  </a>
+                </td>
+                {% endif %}
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <!-- Share functionality -->
+      <div class="card-footer bg-light">
+        <div class="row align-items-center">
+          <!-- Merge More Button -->
+          <div class="col-md-4">
+            <a href="/merge" class="btn btn-secondary">
+              <i class="fas fa-plus me-1"></i>Merge More Images
+            </a>
+          </div>
+
+          <!-- Share Section -->
+          <div class="col-md-8">
+            <div class="d-flex justify-content-end align-items-center flex-wrap">
+              <!-- "Loved it?" Message -->
+              <div class="me-3 mb-2 mb-md-0">
+                <span class="text-muted">
+                  <i class="fas fa-heart text-danger me-1 heartbeat-icon"></i>
+                  <small>Loved it? Share with others!</small>
+                </span>
+              </div>
+
+              <!-- Individual Share Icons with SVG -->
+              <div class="share-icons d-flex gap-2 align-items-center">
+                <!-- Twitter -->
+                <button class="btn btn-outline-primary btn-sm share-btn twitter-btn"
+                        onclick="shareOnTwitter()"
+                        title="Share on Twitter"
+                        data-bs-toggle="tooltip">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                  </svg>
+                </button>
+
+                <!-- Facebook -->
+                <button class="btn btn-outline-primary btn-sm share-btn facebook-btn"
+                        onclick="shareOnFacebook()"
+                        title="Share on Facebook"
+                        data-bs-toggle="tooltip">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                  </svg>
+                </button>
+
+                <!-- LinkedIn -->
+                <button class="btn btn-outline-info btn-sm share-btn linkedin-btn"
+                        onclick="shareOnLinkedIn()"
+                        title="Share on LinkedIn"
+                        data-bs-toggle="tooltip">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                  </svg>
+                </button>
+
+                <!-- WhatsApp -->
+                <button class="btn btn-outline-success btn-sm share-btn whatsapp-btn"
+                        onclick="shareOnWhatsApp()"
+                        title="Share on WhatsApp"
+                        data-bs-toggle="tooltip">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.890-5.335 11.893-11.893A11.821 11.821 0 0020.531 3.488"/>
+                  </svg>
+                </button>
+
+                <!-- Instagram -->
+                <button class="btn btn-outline-danger btn-sm share-btn instagram-btn"
+                        onclick="shareOnInstagram()"
+                        title="Share on Instagram"
+                        data-bs-toggle="tooltip">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                  </svg>
+                </button>
+
+                <!-- More Options Dropdown -->
+                <div class="btn-group">
+                  <button type="button"
+                          class="btn btn-outline-secondary btn-sm dropdown-toggle share-btn more-btn"
+                          data-bs-toggle="dropdown"
+                          aria-expanded="false"
+                          title="More sharing options"
+                          data-bs-original-title="More sharing options">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+                    </svg>
+                  </button>
+                  <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                    <li><h6 class="dropdown-header text-primary">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 4px;">
+                        <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/>
+                      </svg>More Options
+                    </h6></li>
+                    <li><a class="dropdown-item" href="#" onclick="copyToClipboard()">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px;">
+                        <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                      </svg>Copy Link
+                    </a></li>
+                    <li><a class="dropdown-item" href="#" onclick="shareViaEmail()">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px;">
+                        <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                      </svg>Email
+                    </a></li>
+                    <li><a class="dropdown-item" href="#" onclick="shareViaSMS()">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px;">
+                        <path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h4l4 4 4-4h4c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
+                      </svg>SMS
+                    </a></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<style>
+.share-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50% !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  border-width: 1.5px !important;
+}
+
+.share-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Platform-specific hover effects with brand colors */
+.twitter-btn:hover {
+  background: #1da1f2 !important;
+  border-color: #1da1f2 !important;
+  color: white !important;
+}
+
+.facebook-btn:hover {
+  background: #4267B2 !important;
+  border-color: #4267B2 !important;
+  color: white !important;
+}
+
+.linkedin-btn:hover {
+  background: #0077b5 !important;
+  border-color: #0077b5 !important;
+  color: white !important;
+}
+
+.whatsapp-btn:hover {
+  background: #25d366 !important;
+  border-color: #25d366 !important;
+  color: white !important;
+}
+
+.instagram-btn:hover {
+  background: linear-gradient(45deg, #e4405f, #c13584) !important;
+  border-color: #e4405f !important;
+  color: white !important;
+}
+
+.more-btn:hover {
+  background: #6c757d !important;
+  border-color: #6c757d !important;
+  color: white !important;
+}
+
+/* Pulse animation for heart icon */
+.heartbeat-icon {
+  animation: heartbeat 2s ease-in-out infinite;
+}
+
+@keyframes heartbeat {
+  0% { transform: scale(1); }
+  14% { transform: scale(1.1); }
+  28% { transform: scale(1); }
+  42% { transform: scale(1.1); }
+  70% { transform: scale(1); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .share-icons {
+    justify-content: center;
+    margin-top: 10px;
+  }
+
+  .share-btn {
+    width: 32px;
+    height: 32px;
+  }
+
+  .col-md-4, .col-md-8 {
+    text-align: center;
+  }
+}
+
+/* Dropdown styling */
+.dropdown-menu {
+  border: none;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1) !important;
+}
+
+.dropdown-item {
+  transition: all 0.2s ease;
+  border-radius: 8px;
+  margin: 2px 8px;
+}
+
+.dropdown-item:hover {
+  background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+  transform: translateX(5px);
+}
+
+/* Ripple effect */
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.6);
+  pointer-events: none;
+  animation: ripple-animation 0.6s ease-out;
+}
+
+@keyframes ripple-animation {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+.dropArea {
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  padding: 40px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.dropArea:hover, .dropArea.drag-over {
+  border-color: #198754;
+  background-color: rgba(25, 135, 84, 0.1);
+}
+
+.image-preview-item {
+  position: relative;
+  display: inline-block;
+  margin: 5px;
+  border: 2px solid #dee2e6;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: move;
+}
+
+.image-preview-item img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+}
+
+.image-preview-item .remove-btn {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.image-preview-item.dragging {
+  opacity: 0.5;
+  transform: rotate(5deg);
+}
+
+.heartbeat-icon {
+  animation: heartbeat 2s ease-in-out infinite;
+}
+
+@keyframes heartbeat {
+  0% { transform: scale(1); }
+  14% { transform: scale(1.1); }
+  28% { transform: scale(1); }
+  42% { transform: scale(1.1); }
+  70% { transform: scale(1); }
+}
+
+.form-control-color {
+  max-width: 50px;
+}
+</style>
+
+<script>
+function updateLayoutOptions() {
+  const mode = document.getElementById('layoutMode').value;
+  const gridOptions = document.getElementById('gridOptions');
+  const alignment = document.getElementById('alignment');
+
+  if (mode === 'grid') {
+    gridOptions.style.display = 'block';
+    alignment.innerHTML = `
+      <option value="center">Center</option>
+      <option value="fill">Fill Cells</option>
+    `;
+  } else {
+    gridOptions.style.display = 'none';
+    if (mode === 'horizontal') {
+      alignment.innerHTML = `
+        <option value="center">Center</option>
+        <option value="top">Top</option>
+        <option value="bottom">Bottom</option>
+      `;
+    } else {
+      alignment.innerHTML = `
+        <option value="center">Center</option>
+        <option value="left">Left</option>
+        <option value="right">Right</option>
+      `;
+    }
+  }
+}
+
+// Color picker sync
+document.querySelector('input[name="bg_color"]').addEventListener('change', function() {
+  document.querySelector('input[name="bg_color_hex"]').value = this.value;
+});
+
+document.querySelector('input[name="bg_color_hex"]').addEventListener('input', function() {
+  if (/^#[0-9A-F]{6}$/i.test(this.value)) {
+    document.querySelector('input[name="bg_color"]').value = this.value;
+  }
+});
+
+// File upload handling
+const dropArea = document.getElementById('dropArea');
+const fileInput = document.getElementById('fileInput');
+const selectionInfo = document.getElementById('selectionInfo');
+const fileCount = document.getElementById('fileCount');
+const imagePreview = document.getElementById('imagePreview');
+const imageList = document.getElementById('imageList');
+const mergeBtn = document.getElementById('mergeBtn');
+
+let selectedFiles = [];
+
+dropArea.addEventListener('click', () => fileInput.click());
+dropArea.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  dropArea.classList.add('drag-over');
+});
+dropArea.addEventListener('dragleave', () => dropArea.classList.remove('drag-over'));
+dropArea.addEventListener('drop', (e) => {
+  e.preventDefault();
+  dropArea.classList.remove('drag-over');
+  fileInput.files = e.dataTransfer.files;
+  updateFileSelection();
+});
+
+fileInput.addEventListener('change', updateFileSelection);
+
+function updateFileSelection() {
+  const files = Array.from(fileInput.files);
+  selectedFiles = files;
+  fileCount.textContent = files.length;
+
+  if (files.length >= 2) {
+    selectionInfo.style.display = 'block';
+    imagePreview.style.display = 'block';
+    mergeBtn.disabled = false;
+    renderImagePreviews();
+  } else {
+    selectionInfo.style.display = files.length > 0 ? 'block' : 'none';
+    imagePreview.style.display = 'none';
+    mergeBtn.disabled = true;
+  }
+}
+
+function renderImagePreviews() {
+  imageList.innerHTML = '';
+
+  selectedFiles.forEach((file, index) => {
+    if (file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const previewItem = document.createElement('div');
+        previewItem.className = 'image-preview-item';
+        previewItem.draggable = true;
+        previewItem.dataset.index = index;
+
+        previewItem.innerHTML = `
+          <img src="${e.target.result}" alt="${file.name}">
+          <button type="button" class="remove-btn" onclick="removeImage(${index})">&times;</button>
+          <div class="small text-center p-1 bg-light text-truncate" style="max-width: 84px;">${file.name}</div>
+        `;
+
+        // Add drag and drop functionality
+        previewItem.addEventListener('dragstart', handleDragStart);
+        previewItem.addEventListener('dragover', handleDragOver);
+        previewItem.addEventListener('drop', handleDrop);
+        previewItem.addEventListener('dragend', handleDragEnd);
+
+        imageList.appendChild(previewItem);
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+}
+
+function removeImage(index) {
+  selectedFiles.splice(index, 1);
+
+  // Update file input
+  const dt = new DataTransfer();
+  selectedFiles.forEach(file => dt.items.add(file));
+  fileInput.files = dt.files;
+
+  updateFileSelection();
+}
+
+// Drag and drop reordering
+let draggedElement = null;
+
+function handleDragStart(e) {
+  draggedElement = this;
+  this.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/html', this.outerHTML);
+}
+
+function handleDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  return false;
+}
+
+function handleDrop(e) {
+  e.preventDefault();
+  if (this !== draggedElement) {
+    const draggedIndex = parseInt(draggedElement.dataset.index);
+    const targetIndex = parseInt(this.dataset.index);
+
+    // Reorder files array
+    const draggedFile = selectedFiles[draggedIndex];
+    selectedFiles.splice(draggedIndex, 1);
+    selectedFiles.splice(targetIndex, 0, draggedFile);
+
+    // Update file input
+    const dt = new DataTransfer();
+    selectedFiles.forEach(file => dt.items.add(file));
+    fileInput.files = dt.files;
+
+    renderImagePreviews();
+  }
+  return false;
+}
+
+function handleDragEnd(e) {
+  this.classList.remove('dragging');
+  draggedElement = null;
+}
+
+// Download All functionality
+{% if all_downloads and all_downloads|length > 0 %}
+document.getElementById("downloadAll")?.addEventListener("click", function() {
+  const files = {{ all_downloads|tojson }};
+  files.forEach((url, i) => {
+    setTimeout(() => {
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = '';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }, i * 300);
+  });
+});
+{% endif %}
+
+// Initialize
+updateLayoutOptions();
+
+const shareUrl = window.location.href;
+const shareTitle = "Merge JPG Images Online - resizeimages.co.in";
+const shareText = "I just merged my photos using this amazing free online tool! Check it out:";
+
+</script>
+
+{% endblock %}
+

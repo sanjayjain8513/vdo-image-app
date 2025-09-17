@@ -1,0 +1,899 @@
+{% extends "base.html" %}
+
+{% block title %}Compress Videos Online - Reduce MP4 AVI MOV Size | resizeimages.co.in{% endblock %}
+{% block description %}Professional video compression tool. Reduce MP4, AVI, MOV, MKV file sizes while maintaining quality. Secure video compressor with batch processing.{% endblock %}
+{% block keywords %}video compressor, compress mp4, reduce video size, video optimizer, compress avi, compress mov, mkv compressor, video file size reducer{% endblock %}
+
+{% block hero %}
+<div class="hero-section text-center">
+  <div class="container">
+    <h1 class="display-4 fw-bold mb-3">
+      <i class="fas fa-video fa-lg me-3"></i>Video Compression
+    </h1>
+    <p class="lead mb-4">Compress MP4, AVI, MOV, MKV videos while preserving quality. Advanced video optimization with timestamps preservation.</p>
+    <div class="row justify-content-center">
+      <div class="col-md-4">
+        <div class="card card-feature bg-white bg-opacity-10 border-0 text-white">
+          <div class="card-body text-center">
+            <i class="fas fa-film fa-2x mb-2"></i>
+            <h5>Multiple Formats</h5>
+            <p class="mb-0">MP4, AVI, MOV, MKV, WMV, FLV, WebM</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card card-feature bg-white bg-opacity-10 border-0 text-white">
+          <div class="card-body text-center">
+            <i class="fas fa-compress-arrows-alt fa-2x mb-2"></i>
+            <h5>Smart Compression</h5>
+            <p class="mb-0">Up to 80% size reduction with quality preservation</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card card-feature bg-white bg-opacity-10 border-0 text-white">
+          <div class="card-body text-center">
+            <i class="fas fa-clock fa-2x mb-2"></i>
+            <h5>Timestamp Preservation</h5>
+            <p class="mb-0">Original creation dates maintained</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<!-- Authentication Check (initially hidden, shown by JS if needed) -->
+<div id="authRequired" class="row justify-content-center" style="display: none;">
+  <div class="col-lg-8">
+    <div class="alert alert-warning text-center">
+      <h4><i class="fas fa-lock me-2"></i>Authentication Required</h4>
+      <p class="mb-3">Video compression requires user authentication for security and resource management.</p>
+      <a href="/login" class="btn btn-primary btn-lg">
+        <i class="fas fa-sign-in-alt me-2"></i>Login to Continue
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Main Upload Interface (shown by default, hidden by JS if not authenticated) -->
+<div id="uploadInterface">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h3 class="card-title mb-0">
+            <i class="fas fa-video me-2"></i>Video Compression Tool
+          </h3>
+        </div>
+        <div class="card-body">
+          <div class="mb-3 text-muted">
+            <strong>Upload constraints:</strong>
+            Max files: <span class="badge bg-secondary">10</span>,
+            Types: <span class="badge bg-secondary">MP4, AVI, MOV, MKV, WMV, FLV, WebM</span>,
+            Max size per file: <span class="badge bg-secondary">1 GB</span>
+          </div>
+
+          <form id="videoForm" enctype="multipart/form-data">
+            <div id="dropArea" class="dropArea mb-3" onclick="document.getElementById('fileInput').click()">
+              <i class="fas fa-cloud-upload-alt fa-3x mb-2 text-muted"></i>
+              <p class="mb-2">Click or drag & drop video files here</p>
+              <small class="text-muted">Supports MP4, AVI, MOV, MKV, WMV, FLV, WebM formats</small>
+            </div>
+            <input type="file" 
+                   id="fileInput" 
+                   name="files[]" 
+                   accept=".mp4,.avi,.mov,.mkv,.wmv,.flv,.webm,video/*" 
+                   multiple 
+                   style="display:none">
+
+            <div id="selectionInfo" class="selection-info mt-3" style="display:none;">
+              <div class="alert alert-info">
+                <strong><span id="fileCount">0</span></strong> file(s) selected for compression
+              </div>
+              <div id="thumbnails" class="d-flex flex-wrap"></div>
+            </div>
+
+            <!-- Compression Settings -->
+            <div class="row g-3 mt-3">
+              <div class="col-md-6">
+                <label class="form-label">
+                  <i class="fas fa-cog me-1"></i>Video Codec
+                </label>
+                <select class="form-select" id="codec" name="codec">
+                  <option value="h264">H.264 (x264) - Fast & Compatible</option>
+                  <option value="h265">H.265 (x265) - Maximum Efficiency</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">
+                  <i class="fas fa-sliders-h me-1"></i>Compression Level
+                </label>
+                <select class="form-select" id="level" name="level" onchange="updateLevelDescription()">
+                  <option value="lossless">Lossless - Preserve Maximum Quality</option>
+                  <option value="high_quality">High Quality - Minimal Compression</option>
+                  <option value="balanced" selected>Balanced - Good Quality/Size Ratio</option>
+                  <option value="youtube">YouTube Style - ~1GB/hour</option>
+                  <option value="aggressive">Aggressive - ~750MB/hour</option>
+                  <option value="maximum">Maximum - ~500MB/hour</option>
+                </select>
+              </div>
+            </div>
+
+            <div id="levelDescription" class="alert alert-info mt-3">
+              <i class="fas fa-info-circle me-2"></i>
+              Good balance between quality and file size. Suitable for most use cases.
+            </div>
+
+            <div class="text-center mt-4">
+              <button type="submit" class="btn btn-primary btn-lg px-5" id="compressBtn" disabled>
+                <i class="fas fa-play me-2"></i>Start Compression
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Upload Progress Section -->
+  <div class="row justify-content-center mt-4" id="uploadProgress" style="display: none;">
+    <div class="col-lg-8">
+      <div class="card shadow-sm border-info">
+        <div class="card-header bg-info text-white">
+          <h4 class="mb-0">
+            <i class="fas fa-upload me-2"></i>Uploading Files
+          </h4>
+        </div>
+        <div class="card-body">
+          <div class="progress mb-3" style="height: 25px;">
+            <div class="progress-bar progress-bar-striped progress-bar-animated" id="uploadProgressBar" style="width: 0%">
+              <span id="uploadPercent">0%</span>
+            </div>
+          </div>
+          <div class="text-center">
+            <p id="uploadStatus">Preparing files for upload...</p>
+            <small class="text-muted">Please keep this page open during upload and processing.</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Processing Progress Section -->
+  <div class="row justify-content-center mt-4" id="progressSection" style="display: none;">
+    <div class="col-lg-8">
+      <div class="card shadow-sm">
+        <div class="card-header bg-success text-white">
+          <h4 class="mb-0 text-center">
+            <i class="fas fa-cogs me-2"></i>Processing Videos
+          </h4>
+        </div>
+        <div class="card-body">
+          <div class="container-fluid px-0">
+            <div id="progressList">
+              <!-- Progress items will be populated here -->
+            </div>
+            
+            <!-- Download URLs Section -->
+            <div id="downloadUrls" class="mt-4" style="display: none;">
+              <div class="alert alert-success">
+                <h5 class="text-center"><i class="fas fa-link me-2"></i>Permanent Download Links</h5>
+                <p class="mb-3 text-center">Save these links to download your files anytime:</p>
+                <div id="urlList"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cleanup Section -->
+  <div class="row justify-content-center mt-4" id="cleanupSection" style="display: none;">
+    <div class="col-lg-8">
+      <div class="text-center">
+        <button class="btn btn-danger" id="cleanupBtn" onclick="cleanupJob()">
+          <i class="fas fa-trash me-2"></i>Delete All Files
+        </button>
+        <p class="text-muted mt-2">
+          <small>Files are automatically deleted after 1 hour for security</small>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.dropArea {
+  border: 3px dashed #dfe6ef;
+  padding: 40px 24px;
+  border-radius: 15px;
+  text-align: center;
+  cursor: pointer;
+  background: #fbfdff;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 1;
+  user-select: none;
+}
+
+.dropArea * {
+  pointer-events: none;
+}
+
+.dropArea:hover {
+  border-color: #667eea;
+  background: #f0f8ff;
+}
+
+.dropArea.dragover {
+  border-color: #667eea;
+  background: #e7f3ff;
+  transform: scale(1.02);
+}
+
+.file-item {
+  max-width: 300px;
+}
+
+#progressList {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  padding: 0;
+}
+
+.progress-item {
+  background: white;
+  border-radius: 10px;
+  margin: 15px 0;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  overflow: hidden;
+  width: 100%;
+  max-width: 100%;
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+  flex-wrap: wrap;
+}
+
+.progress-filename {
+  font-weight: 600;
+  color: #495057;
+  word-break: break-word;
+  flex: 1;
+  text-align: left;
+}
+
+.progress-status {
+  padding: 4px 12px;
+  border-radius: 15px;
+  font-size: 0.8em;
+  font-weight: 600;
+  white-space: nowrap;
+  margin-left: 10px;
+}
+
+.progress-details {
+  padding: 15px;
+  font-size: 0.9em;
+  color: #666;
+  text-align: left;
+}
+
+.url-item {
+  margin: 15px 0;
+  width: 100%;
+}
+
+.card-body .container-fluid {
+  padding: 0;
+}
+
+@media (max-width: 768px) {
+  .progress-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .progress-filename {
+    max-width: 100%;
+  }
+  
+  .progress-status {
+    margin-left: 0;
+  }
+}
+
+.progress-status {
+  padding: 4px 12px;
+  border-radius: 15px;
+  font-size: 0.8em;
+  font-weight: 600;
+}
+
+.status-queued { background: #ffc107; color: #856404; }
+.status-analyzing { background: #17a2b8; color: white; }
+.status-processing { background: #007bff; color: white; }
+.status-completed { background: #28a745; color: white; }
+.status-failed { background: #dc3545; color: white; }
+.status-skipped { background: #6c757d; color: white; }
+
+.progress-bar-custom {
+  height: 8px;
+  background: #e9ecef;
+  margin: 0 15px 10px 15px;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #007bff, #28a745);
+  transition: width 0.3s ease;
+  border-radius: 4px;
+}
+
+.progress-details {
+  padding: 15px;
+  font-size: 0.9em;
+  color: #666;
+}
+
+.download-link {
+  color: #28a745;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.download-link:hover {
+  color: #20c997;
+  text-decoration: underline;
+}
+</style>
+
+<script>
+let currentJobId = null;
+let statusInterval = null;
+let selectedFiles = [];
+let isAuthenticated = false;
+
+const levelDescriptions = {
+  'lossless': 'Preserves original quality with minimal size reduction. Skips already optimized files.',
+  'high_quality': 'Slight compression with excellent quality retention. Preserves original resolution.',
+  'balanced': 'Good balance between quality and file size. Suitable for most use cases.',
+  'youtube': 'YouTube-style compression (~1GB/hour). Limits to 1080p and 30fps for mobile videos.',
+  'aggressive': 'High compression (~750MB/hour). Optimized for storage savings with good quality.',
+  'maximum': 'Maximum compression (~500MB/hour). Smallest file sizes with acceptable quality.'
+};
+
+document.addEventListener('DOMContentLoaded', function() {
+  checkAuthAndSetup();
+});
+
+async function checkAuthAndSetup() {
+  try {
+    const response = await fetch('/check-auth');
+    const data = await response.json();
+    
+    isAuthenticated = data.authenticated;
+    
+    if (!isAuthenticated) {
+      // Show login required message and hide upload interface
+      document.getElementById('authRequired').style.display = 'block';
+      document.getElementById('uploadInterface').style.display = 'none';
+      return;
+    }
+    
+    // User is authenticated, setup the interface
+    setupInterface();
+    
+  } catch (error) {
+    console.error('Auth check failed, assuming not authenticated:', error);
+    // On error, still show interface but handle auth failures in form submission
+    setupInterface();
+  }
+}
+
+function setupInterface() {
+  setupVideoDropArea();
+  updateLevelDescription();
+}
+
+function setupVideoDropArea() {
+  const drop = document.getElementById('dropArea');
+  const input = document.getElementById('fileInput');
+  const count = document.getElementById('fileCount');
+  const thumbs = document.getElementById('thumbnails');
+  const form = document.getElementById('videoForm');
+
+  if (!drop || !input || !count || !thumbs || !form) {
+    console.error('Missing required elements');
+    return;
+  }
+
+  // Simple file selection on input change
+  input.addEventListener('change', function() {
+    console.log('File input changed');
+    const files = Array.from(input.files);
+    addFiles(files);
+  });
+
+  // Drag and drop events (simplified)
+  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    drop.addEventListener(eventName, preventDefaults, false);
+  });
+
+  function preventDefaults(e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+
+  ['dragenter', 'dragover'].forEach(eventName => {
+    drop.addEventListener(eventName, highlight, false);
+  });
+
+  ['dragleave', 'drop'].forEach(eventName => {
+    drop.addEventListener(eventName, unhighlight, false);
+  });
+
+  function highlight(e) {
+    drop.classList.add('dragover');
+  }
+
+  function unhighlight(e) {
+    drop.classList.remove('dragover');
+  }
+
+  // Handle dropped files
+  drop.addEventListener('drop', handleDrop, false);
+
+  function handleDrop(e) {
+    const dt = e.dataTransfer;
+    const files = Array.from(dt.files);
+    console.log('Files dropped:', files.length);
+    addFiles(files);
+  }
+
+  // Form validation
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    if (selectedFiles.length === 0) {
+      alert('Please select video files first');
+      return;
+    }
+    handleFormSubmit(e);
+  });
+
+  console.log('Video drop area setup complete');
+}
+
+function addFiles(files) {
+  const validExtensions = ['mp4', 'avi', 'mov', 'mkv', 'wmv', 'flv', 'webm'];
+  const validFiles = files.filter(file => {
+    const extension = file.name.split('.').pop().toLowerCase();
+    const size = file.size <= 1024 * 1024 * 1024; // 1GB limit
+    return validExtensions.includes(extension) && size;
+  });
+
+  selectedFiles = validFiles.slice(0, 10); // Max 10 files
+  updateFileDisplay();
+}
+
+function updateFileDisplay() {
+  const selectionInfo = document.getElementById('selectionInfo');
+  const fileCount = document.getElementById('fileCount');
+  const thumbnails = document.getElementById('thumbnails');
+  const compressBtn = document.getElementById('compressBtn');
+
+  if (selectedFiles.length === 0) {
+    selectionInfo.style.display = 'none';
+    compressBtn.disabled = true;
+    return;
+  }
+
+  selectionInfo.style.display = 'block';
+  fileCount.textContent = selectedFiles.length;
+  compressBtn.disabled = false;
+
+  thumbnails.innerHTML = selectedFiles.map((file, index) => `
+    <div class="file-item me-3 mb-2 p-2 border rounded bg-light">
+      <div class="d-flex align-items-center">
+        <i class="fas fa-video text-primary me-2"></i>
+        <div class="flex-grow-1">
+          <div class="fw-bold">${file.name}</div>
+          <small class="text-muted">${formatFileSize(file.size)}</small>
+        </div>
+        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeFile(${index})">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function removeFile(index) {
+  selectedFiles.splice(index, 1);
+  updateFileDisplay();
+}
+
+function formatFileSize(bytes) {
+  if (bytes === 0) return '0 Bytes';
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+function updateLevelDescription() {
+  const level = document.getElementById('level').value;
+  const descDiv = document.getElementById('levelDescription');
+  descDiv.innerHTML = `<i class="fas fa-info-circle me-2"></i>${levelDescriptions[level]}`;
+}
+
+async function handleFormSubmit(e) {
+  e.preventDefault();
+
+  if (selectedFiles.length === 0) {
+    alert('Please select video files first');
+    return;
+  }
+
+  // Show upload progress
+  showUploadProgress();
+
+  const formData = new FormData();
+  selectedFiles.forEach(file => {
+    formData.append('files[]', file);
+  });
+  
+  formData.append('codec', document.getElementById('codec').value);
+  formData.append('level', document.getElementById('level').value);
+
+  try {
+    const xhr = new XMLHttpRequest();
+    
+    xhr.upload.addEventListener('progress', (e) => {
+      if (e.lengthComputable) {
+        const percentComplete = (e.loaded / e.total) * 100;
+        updateUploadProgress(percentComplete, e.loaded, e.total);
+      }
+    });
+
+    xhr.addEventListener('load', () => {
+      hideUploadProgress();
+      
+      if (xhr.status === 200) {
+        const data = JSON.parse(xhr.responseText);
+        currentJobId = data.job_id;
+        showProcessingSection();
+        startStatusPolling();
+      } else if (xhr.status === 401) {
+        alert('Please login first to use video compression');
+        window.location.href = '/login';
+      } else {
+        alert('Upload failed: ' + xhr.status);
+      }
+    });
+
+    xhr.addEventListener('error', () => {
+      hideUploadProgress();
+      alert('Upload failed - network error');
+    });
+
+    xhr.open('POST', '/video/upload');
+    xhr.send(formData);
+
+  } catch (error) {
+    hideUploadProgress();
+    console.error('Upload error:', error);
+    alert('Upload failed: ' + error.message);
+  }
+}
+
+function showUploadProgress() {
+  document.getElementById('uploadProgress').style.display = 'block';
+  document.getElementById('compressBtn').disabled = true;
+}
+
+function hideUploadProgress() {
+  document.getElementById('uploadProgress').style.display = 'none';
+  document.getElementById('compressBtn').disabled = false;
+}
+
+function updateUploadProgress(percent, loaded, total) {
+  const progressBar = document.getElementById('uploadProgressBar');
+  const uploadPercent = document.getElementById('uploadPercent');
+  const uploadStatus = document.getElementById('uploadStatus');
+
+  const roundedPercent = Math.round(percent);
+  progressBar.style.width = roundedPercent + '%';
+  uploadPercent.textContent = roundedPercent + '%';
+  
+  if (percent < 100) {
+    uploadStatus.textContent = `Uploading ${selectedFiles.length} file(s)... ${formatFileSize(loaded)} / ${formatFileSize(total)}`;
+  } else {
+    uploadStatus.textContent = 'Upload complete! Processing will begin shortly...';
+  }
+}
+
+function showProcessingSection() {
+  document.getElementById('progressSection').style.display = 'block';
+  document.getElementById('progressSection').scrollIntoView({ behavior: 'smooth' });
+  
+  // Show download URLs immediately when processing starts
+  showDownloadUrls();
+}
+
+function showDownloadUrls() {
+  const downloadUrls = document.getElementById('downloadUrls');
+  const urlList = document.getElementById('urlList');
+  const baseUrl = window.location.origin;
+  
+  if (!currentJobId) return;
+  
+  // Create URLs for all files immediately (they'll be available when processing completes)
+  const urlItems = selectedFiles.map((file, index) => {
+    const fullUrl = `${baseUrl}/video/download/${currentJobId}/${index}`;
+    
+    return `
+      <div class="url-item mb-3 p-3 bg-light rounded">
+        <div class="row align-items-center">
+          <div class="col-md-8">
+            <strong>${file.name}</strong><br>
+            <code class="url-text small">${fullUrl}</code>
+            <br><small class="text-muted">This link will be ready when processing completes</small>
+          </div>
+          <div class="col-md-4 text-end">
+            <button class="btn btn-outline-success btn-sm me-2" onclick="copyUrl('${fullUrl}')">
+              <i class="fas fa-copy me-1"></i>Copy Link
+            </button>
+            <span class="badge bg-info">Processing...</span>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+  
+  urlList.innerHTML = urlItems;
+  downloadUrls.style.display = 'block';
+}
+
+function startStatusPolling() {
+  statusInterval = setInterval(async () => {
+    if (currentJobId) {
+      await checkJobStatus();
+    }
+  }, 2000);
+}
+
+async function checkJobStatus() {
+  try {
+    const response = await fetch(`/video/status/${currentJobId}`);
+    
+    if (response.status === 401) {
+      alert('Session expired. Please login again.');
+      window.location.href = '/login';
+      return;
+    }
+    
+    if (response.ok) {
+      const job = await response.json();
+      updateProgressDisplay(job);
+      
+      if (job.status === 'completed' || job.status === 'failed' || job.status === 'partially_completed') {
+        clearInterval(statusInterval);
+        document.getElementById('cleanupSection').style.display = 'block';
+      }
+    }
+  } catch (error) {
+    console.error('Status check failed:', error);
+  }
+}
+
+function updateProgressDisplay(job) {
+  const progressList = document.getElementById('progressList');
+  
+  progressList.innerHTML = job.files.map((file, index) => {
+    const statusClass = `status-${file.status}`;
+    const statusText = file.status.replace('_', ' ').toUpperCase();
+    
+    return `
+      <div class="progress-item">
+        <div class="progress-header">
+          <span class="progress-filename">
+            <i class="fas fa-video me-2"></i>${file.filename}
+          </span>
+          <span class="progress-status ${statusClass}">${statusText}</span>
+        </div>
+        <div class="progress-bar-custom">
+          <div class="progress-fill" style="width: ${file.progress || 0}%"></div>
+        </div>
+        <div class="progress-details">
+          ${file.status === 'completed' || file.status === 'skipped' ? `
+            <div class="row">
+              <div class="col-md-8">
+                <strong>Results:</strong><br>
+                Original: ${formatFileSize(file.original_size)} → 
+                Compressed: ${formatFileSize(file.compressed_size)}
+                ${file.compression_ratio > 0 ? `<span class="badge bg-success ms-2">${file.compression_ratio}% saved</span>` : '<span class="badge bg-warning ms-2">File kept as-is</span>'}
+                ${file.message ? `<br><small class="text-muted">${file.message}</small>` : ''}
+              </div>
+              <div class="col-md-4 text-end">
+                <a href="/video/download/${currentJobId}/${index}" class="download-link" target="_blank">
+                  <i class="fas fa-download me-1"></i>Download Video
+                </a>
+              </div>
+            </div>
+          ` : file.status === 'failed' ? `
+            <div class="text-danger">
+              <i class="fas fa-exclamation-triangle me-2"></i>
+              Error: ${file.error || 'Processing failed'}
+            </div>
+          ` : file.status === 'processing' ? `
+            <div class="text-primary">
+              <i class="fas fa-cogs fa-spin me-2"></i>
+              Processing video... ${file.progress || 0}% complete
+              ${file.analysis ? `<br><small class="text-muted">${file.analysis}</small>` : ''}
+            </div>
+          ` : `
+            <div class="text-muted">
+              <i class="fas fa-clock me-2"></i>
+              ${file.analysis || 'Waiting to start...'}
+            </div>
+          `}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  // Update the download link buttons in the URL section
+  updateDownloadLinkStatus(job);
+}
+
+function updateDownloadLinkStatus(job) {
+  const urlList = document.getElementById('urlList');
+  const baseUrl = window.location.origin;
+  
+  if (!urlList || !currentJobId) return;
+  
+  const urlItems = job.files.map((file, index) => {
+    const fullUrl = `${baseUrl}/video/download/${currentJobId}/${index}`;
+    const isReady = file.status === 'completed' || file.status === 'skipped';
+    const isFailed = file.status === 'failed';
+    
+    return `
+      <div class="url-item mb-3 p-3 bg-light rounded">
+        <div class="row align-items-center">
+          <div class="col-md-8">
+            <strong>${file.filename}</strong><br>
+            <code class="url-text small">${fullUrl}</code>
+            <br><small class="text-muted">
+              ${isReady ? 'Ready for download!' : 
+                isFailed ? 'Processing failed' :
+                'This link will be ready when processing completes'}
+            </small>
+          </div>
+          <div class="col-md-4 text-end">
+            <button class="btn btn-outline-success btn-sm me-2" onclick="copyUrl('${fullUrl}')">
+              <i class="fas fa-copy me-1"></i>Copy Link
+            </button>
+            ${isReady ? 
+              `<a href="${fullUrl}" class="btn btn-success btn-sm" target="_blank">
+                <i class="fas fa-download me-1"></i>Download
+              </a>` :
+              isFailed ?
+                `<span class="badge bg-danger">Failed</span>` :
+                `<span class="badge bg-info">Processing...</span>`
+            }
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+  
+  urlList.innerHTML = urlItems;
+}
+
+function copyUrl(url) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(() => {
+      showToast('Link copied to clipboard!', 'success');
+    }).catch(() => {
+      fallbackCopy(url);
+    });
+  } else {
+    fallbackCopy(url);
+  }
+}
+
+function fallbackCopy(text) {
+  const textarea = document.createElement('textarea');
+  textarea.value = text;
+  textarea.style.position = 'fixed';
+  textarea.style.opacity = '0';
+  document.body.appendChild(textarea);
+  
+  try {
+    textarea.select();
+    textarea.setSelectionRange(0, 99999);
+    const successful = document.execCommand('copy');
+    
+    if (successful) {
+      showToast('Link copied to clipboard!', 'success');
+    } else {
+      showToast('Failed to copy link', 'error');
+    }
+  } catch (err) {
+    showToast('Failed to copy link', 'error');
+  } finally {
+    document.body.removeChild(textarea);
+  }
+}
+
+function showToast(message, type = 'info') {
+  const toast = document.createElement('div');
+  toast.className = `alert alert-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'} position-fixed`;
+  toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+  toast.innerHTML = `
+    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-triangle' : 'info-circle'} me-2"></i>
+    ${message}
+  `;
+  
+  document.body.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.style.transition = 'opacity 0.5s ease';
+    toast.style.opacity = '0';
+    setTimeout(() => toast.remove(), 500);
+  }, 3000);
+}
+
+async function cleanupJob() {
+  if (!currentJobId) return;
+  
+  if (confirm('This will delete all uploaded and processed files. Continue?')) {
+    try {
+      const response = await fetch(`/video/cleanup/${currentJobId}`, { method: 'DELETE' });
+      
+      if (response.ok) {
+        alert('All files deleted successfully');
+        resetInterface();
+      } else {
+        const data = await response.json();
+        alert('Error: ' + (data.error || 'Unknown error'));
+      }
+    } catch (error) {
+      alert('Error deleting files: ' + error);
+    }
+  }
+}
+
+function resetInterface() {
+  currentJobId = null;
+  selectedFiles = [];
+  document.getElementById('fileInput').value = '';
+  document.getElementById('selectionInfo').style.display = 'none';
+  document.getElementById('progressSection').style.display = 'none';
+  document.getElementById('cleanupSection').style.display = 'none';
+  document.getElementById('uploadProgress').style.display = 'none';
+  document.getElementById('compressBtn').disabled = true;
+  
+  if (statusInterval) {
+    clearInterval(statusInterval);
+  }
+}
+</script>
+{% endblock %}
