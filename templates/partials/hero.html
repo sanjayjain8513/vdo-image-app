@@ -1,0 +1,28 @@
+<div class="hero-section text-center">
+  <div class="container">
+    <div class="mb-3">
+      <img src="{{ url_for('static', filename='images/logo.png') }}"
+           alt="resizeimages.co.in logo"
+           height="60"
+           class="mb-3">
+    </div>
+    <h1 class="display-4 fw-bold mb-3">
+      <i class="{{ hero_icon }} fa-lg me-3"></i>{{ hero_title }}
+    </h1>
+    <p class="lead mb-4">{{ hero_subtitle }}</p>
+    <div class="row justify-content-center">
+      {% for f in hero_features %}
+      <div class="col-md-4">
+        <div class="card card-feature bg-white bg-opacity-10 border-0 text-white">
+          <div class="card-body text-center">
+            <i class="{{ f.icon }} fa-2x mb-2"></i>
+            <h5>{{ f.title }}</h5>
+            <p class="mb-0">{{ f.desc }}</p>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+

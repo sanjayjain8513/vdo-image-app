@@ -177,8 +177,9 @@
           </div>
 
           <div class="text-center mt-4">
-            <button type="submit" class="btn btn-primary btn-lg px-5">
-              <i class="fas fa-redo me-2"></i>Rotate Images
+            <button type="button" class="btn btn-primary btn-lg px-5" id="rotateBtn" onclick="this.disabled=true; this.querySelector('i').className='fas fa-spinner fa-spin me-2'; this.querySelector('span').textContent='Rotating Images...'; this.style.backgroundColor='#6c757d'; setTimeout(() => document.getElementById('mainForm').submit(), 100);">
+              <i class="fas fa-redo me-2" id="rotateIcon"></i>
+              <span id="rotateBtnText">Rotate Images</span>
             </button>
           </div>
         </form>
@@ -366,20 +367,26 @@
 </div>
 
 {% if all_downloads and all_downloads|length > 0 %}
+<script src="{{ url_for('static', filename='js/common-functions.js') }}"></script>
 <script>
-document.getElementById("downloadAll")?.addEventListener("click", function() {
-  const files = {{ all_downloads|tojson }};
-  files.forEach((url, i) => {
-    setTimeout(() => {
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = '';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }, i * 300);
+const downloadAllBtn = document.getElementById("downloadAll");
+if (downloadAllBtn) {
+  // Store files data in a way that doesn't break JS parsing
+  const filesData = JSON.parse('{{ all_downloads|tojson|safe }}');
+
+  downloadAllBtn.addEventListener("click", function() {
+    filesData.forEach((url, i) => {
+      setTimeout(() => {
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = '';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }, i * 300);
+    });
   });
-});
+}
 
 const shareUrl = window.location.href;
 const shareTitle = "Rotate Images Online - resizeimages.co.in";
@@ -465,13 +472,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // File upload handling
 document.addEventListener('DOMContentLoaded', function() {
+  // Loading state now handled by inline onclick
+
   const dropArea = document.getElementById('dropArea');
   const fileInput = document.getElementById('fileInput');
   const selectionInfo = document.getElementById('selectionInfo');
   const fileCount = document.getElementById('fileCount');
   const thumbnails = document.getElementById('thumbnails');
 
-  dropArea.addEventListener('click', () => fileInput.click());
+  // Removed duplicate click handler - base.html setupDropArea handles this
   dropArea.addEventListener('dragover', (e) => {
     e.preventDefault();
     dropArea.classList.add('dragover');

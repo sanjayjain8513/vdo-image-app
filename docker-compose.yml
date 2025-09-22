@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./uploads:/app/uploads
+      - ./outputs:/app/outputs
+      - ./video_uploads:/app/video_uploads
+      - ./video_outputs:/app/video_outputs
+      - ./data:/app/data
+    environment:
+      - MAX_FILE_MB=100
+      - MAX_VIDEO_MB=1000
+      - MAX_WORKERS=2
+      - VIDEO_MAX_WORKERS=2
+      - SAFE_PIXELS=50000000
+      - MIN_FREE_MEMORY_MB=500
+      - MAGICK_THREAD_LIMIT=2
+      - OMP_NUM_THREADS=2
+      - OPENCV_NUM_THREADS=2
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 3.5G
+        reservations:
+          cpus: '1.0'
+          memory: 2G
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s

@@ -260,7 +260,7 @@
           <i class="fas fa-check-circle me-2"></i>Merge Results
         </h4>
         {% if all_downloads and all_downloads|length > 0 %}
-        <button id="downloadAll" class="btn btn-light btn-sm">
+        <button id="downloadAll" class="btn btn-light btn-sm" data-downloads="{{ all_downloads|tojson }}">
           <i class="fas fa-download me-1"></i>Download All
         </button>
         {% endif %}
@@ -615,6 +615,7 @@
 }
 </style>
 
+<script src="{{ url_for('static', filename='js/common-functions.js') }}"></script>
 <script>
 function updateLayoutOptions() {
   const mode = document.getElementById('layoutMode').value;
@@ -784,21 +785,32 @@ function handleDragEnd(e) {
 }
 
 // Download All functionality
-{% if all_downloads and all_downloads|length > 0 %}
-document.getElementById("downloadAll")?.addEventListener("click", function() {
-  const files = {{ all_downloads|tojson }};
-  files.forEach((url, i) => {
-    setTimeout(() => {
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = '';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }, i * 300);
+const downloadAllBtn = document.getElementById("downloadAll");
+if (downloadAllBtn) {
+  downloadAllBtn.addEventListener("click", function() {
+    try {
+      const downloadFiles = JSON.parse(this.getAttribute('data-downloads') || '[]');
+      if (downloadFiles && downloadFiles.length > 0) {
+        downloadFiles.forEach(function(url, i) {
+          setTimeout(function() {
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = '';
+            link.target = '_blank';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          }, i * 300);
+        });
+      } else {
+        console.warn('No files available for download');
+      }
+    } catch (error) {
+      console.error('Error downloading files:', error);
+      alert('Error downloading files. Please try again.');
+    }
   });
-});
-{% endif %}
+}
 
 // Initialize
 updateLayoutOptions();

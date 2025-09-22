@@ -17,7 +17,74 @@ from config import (
 )
 
 # Global job storage
-compression_jobs = {}
+import json
+from datetime import datetime, timedelta
+
+# Persistent job storage
+from config import DATA_DIR
+JOBS_FILE = os.path.join(DATA_DIR, 'video_jobs.json')
+
+def load_jobs():
+    """Load jobs from file, cleaning up old ones"""
+    try:
+        if os.path.exists(JOBS_FILE):
+            with open(JOBS_FILE, 'r') as f:
+                jobs = json.load(f)
+
+            # Clean up jobs older than 2 hours
+            current_time = datetime.now()
+            cutoff_time = current_time - timedelta(hours=2)
+
+            jobs_to_remove = []
+            for job_id, job in jobs.items():
+                try:
+                    job_time = datetime.fromisoformat(job.get('created_at', ''))
+                    if job_time < cutoff_time:
+                        jobs_to_remove.append(job_id)
+                except (ValueError, KeyError):
+                    # Invalid timestamp, remove job
+                    jobs_to_remove.append(job_id)
+
+            for job_id in jobs_to_remove:
+                if job_id in jobs:
+                    # Clean up files before removing job
+                    cleanup_job_files(jobs[job_id])
+                    del jobs[job_id]
+
+            # Save cleaned jobs back
+            if jobs_to_remove:
+                save_jobs(jobs)
+
+            return jobs
+        return {}
+    except Exception as e:
+        print(f"Error loading jobs: {e}")
+        return {}
+
+def save_jobs(jobs):
+    """Save jobs to file"""
+    try:
+        with open(JOBS_FILE, 'w') as f:
+            json.dump(jobs, f, indent=2, default=str)
+    except Exception as e:
+        print(f"Error saving jobs: {e}")
+
+def cleanup_job_files(job):
+    """Clean up files for a job"""
+    try:
+        for file_info in job.get('files', []):
+            for path_key in ['input_path', 'output_path', 'zip_path']:
+                if path_key in file_info:
+                    try:
+                        if os.path.exists(file_info[path_key]):
+                            os.remove(file_info[path_key])
+                    except Exception:
+                        pass  # Ignore file deletion errors
+    except Exception:
+        pass
+
+# Load jobs on startup
+compression_jobs = load_jobs()
 
 def allowed_video_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in VIDEO_ALLOWED_EXTENSIONS
@@ -494,6 +561,8 @@ def compress_video(input_path, output_path, job_id, file_index, compression_sett
                 'completed_at': datetime.now().isoformat(),
                 'message': message
             })
+            # Save jobs after file completion
+            save_jobs(compression_jobs)
         else:
             error_msg = f"FFmpeg process failed with return code {return_code}"
             compression_jobs[job_id]['files'][file_index].update({
@@ -501,6 +570,8 @@ def compress_video(input_path, output_path, job_id, file_index, compression_sett
                 'error': error_msg,
                 'completed_at': datetime.now().isoformat()
             })
+            # Save jobs after file failure
+            save_jobs(compression_jobs)
             
     except Exception as e:
         compression_jobs[job_id]['files'][file_index].update({
@@ -508,6 +579,8 @@ def compress_video(input_path, output_path, job_id, file_index, compression_sett
             'error': f"Processing error: {str(e)}",
             'completed_at': datetime.now().isoformat()
         })
+        # Save jobs after file failure
+        save_jobs(compression_jobs)
 
 def process_batch(job_id, compression_settings):
     """Process video batch - from app_latest.py"""
@@ -538,11 +611,17 @@ def process_batch(job_id, compression_settings):
             job['status'] = 'partially_completed' if len(completed_files) > 0 else 'failed'
         
         job['completed_at'] = datetime.now().isoformat()
-        
+
+        # Save jobs after processing
+        save_jobs(compression_jobs)
+
     except Exception as e:
         if job_id in compression_jobs:
             compression_jobs[job_id]['status'] = 'failed'
             compression_jobs[job_id]['error'] = f"Batch processing failed: {str(e)}"
+
+            # Save jobs after failure
+            save_jobs(compression_jobs)
 
 def register_video_routes(app, limiter):
     """Register video compression routes"""
@@ -552,7 +631,6 @@ def register_video_routes(app, limiter):
         return render_template('video.html')
     
     @app.route('/video/upload', methods=['POST'])
-    @login_required
     @limiter.limit('5 per minute')
     def upload_video_files():
         if 'files[]' not in request.files and 'file' not in request.files:
@@ -563,8 +641,44 @@ def register_video_routes(app, limiter):
         if not files or all(f.filename == '' for f in files):
             return jsonify({'error': 'No files selected'}), 400
         
-        if len(files) > MAX_VIDEO_FILES:
-            return jsonify({'error': f'Too many files. Maximum {MAX_VIDEO_FILES} files allowed'}), 400
+        # Check if user is authenticated
+        is_authenticated = 'user' in session
+        
+        # For non-authenticated users, enforce restrictions
+        if not is_authenticated:
+            # Check file count limit for guests (1 file only)
+            if len(files) > 1:
+                return jsonify({
+                    'error': 'Guest users can only process 1 file at a time. Please log in for batch processing.',
+                    'login_required': True,
+                    'guest_limit_exceeded': True
+                }), 403
+            
+            # Check file size limit for guests (50MB)
+            GUEST_MAX_SIZE_MB = 50
+            GUEST_MAX_SIZE_BYTES = GUEST_MAX_SIZE_MB * 1024 * 1024
+            
+            for file in files:
+                if file.filename != '':
+                    # Get file size by seeking to end
+                    file.seek(0, 2)  # Seek to end
+                    file_size = file.tell()
+                    file.seek(0)  # Reset to beginning
+                    
+                    if file_size > GUEST_MAX_SIZE_BYTES:
+                        file_size_mb = file_size / (1024 * 1024)
+                        return jsonify({
+                            'error': f'File "{file.filename}" is {file_size_mb:.1f}MB. Guest users can only process files up to {GUEST_MAX_SIZE_MB}MB. Please log in for larger files.',
+                            'login_required': True,
+                            'file_too_large': True,
+                            'file_size_mb': round(file_size_mb, 1),
+                            'max_size_mb': GUEST_MAX_SIZE_MB
+                        }), 403
+        
+        # Check total file limit (authenticated users get higher limit)
+        max_files = MAX_VIDEO_FILES if is_authenticated else 1
+        if len(files) > max_files:
+            return jsonify({'error': f'Too many files. Maximum {max_files} files allowed'}), 400
         
         valid_files = []
         for file in files:
@@ -627,33 +741,61 @@ def register_video_routes(app, limiter):
             'created_at': datetime.now().isoformat(),
             'settings': compression_settings,
             'download_urls': [f['download_url'] for f in job_files],
-            'user': session['user']
+            'user': session.get('user', 'guest'),
+            'is_guest': not is_authenticated
         }
+
+        # Save jobs to persistent storage
+        save_jobs(compression_jobs)
         
         thread = threading.Thread(target=process_batch, args=(job_id, compression_settings))
         thread.daemon = True
         thread.start()
         
-        return jsonify({
+        response_data = {
             'job_id': job_id,
             'message': f'Successfully uploaded {len(valid_files)} files. Processing started.',
             'file_count': len(valid_files),
             'download_urls': compression_jobs[job_id]['download_urls']
-        })
-    
+        }
+        
+        # Add guest user notice
+        if not is_authenticated:
+            response_data['guest_notice'] = 'You are using the service as a guest. Log in for batch processing and larger files.'
+        
+        return jsonify(response_data)
+        
     @app.route('/video/status/<job_id>')
-    @login_required
     def get_video_status(job_id):
         if job_id not in compression_jobs:
             return jsonify({'error': 'Job not found'}), 404
         
         job = compression_jobs[job_id]
-        if job.get('user') != session['user'] and session.get('role') != 'admin':
+        
+        # Allow guest users to access their own jobs, authenticated users to access their jobs, admins to access all
+        job_user = job.get('user', 'guest')
+        current_user = session.get('user', 'guest')
+        is_admin = session.get('role') == 'admin'
+        is_guest_job = job.get('is_guest', False)
+        is_current_guest = 'user' not in session
+        
+        # Access control logic
+        if is_admin:
+            # Admin can access everything
+            pass
+        elif is_guest_job and is_current_guest:
+            # Guest can access their own guest job
+            pass
+        elif not is_guest_job and job_user == current_user:
+            # Authenticated user can access their own job
+            pass
+        else:
             return jsonify({'error': 'Access denied'}), 403
         
         import copy
         job_copy = copy.deepcopy(job)
         
+        # Remove sensitive paths
         for file_info in job_copy['files']:
             file_info.pop('input_path', None)
             file_info.pop('output_path', None)
@@ -661,7 +803,6 @@ def register_video_routes(app, limiter):
         return jsonify(job_copy)
     
     @app.route('/video/download/<job_id>/<int:file_index>')
-    @login_required
     def download_video_file(job_id, file_index):
         if job_id not in compression_jobs:
             return render_template_string("""
@@ -738,7 +879,23 @@ def register_video_routes(app, limiter):
         
         job = compression_jobs[job_id]
         
-        if job.get('user') != session['user'] and session.get('role') != 'admin':
+        # Same access control logic as status route
+        job_user = job.get('user', 'guest')
+        current_user = session.get('user', 'guest')
+        is_admin = session.get('role') == 'admin'
+        is_guest_job = job.get('is_guest', False)
+        is_current_guest = 'user' not in session
+        
+        # Access control logic
+        access_granted = False
+        if is_admin:
+            access_granted = True
+        elif is_guest_job and is_current_guest:
+            access_granted = True
+        elif not is_guest_job and job_user == current_user:
+            access_granted = True
+        
+        if not access_granted:
             return render_template_string("""
                 <!DOCTYPE html>
                 <html lang="en">
@@ -804,13 +961,14 @@ def register_video_routes(app, limiter):
                     <div class="error-container">
                         <div class="error-icon">⚠</div>
                         <h1 class="error-title">Access Denied</h1>
-                        <p class="error-message">You don't have permission to access this file. You can only download files from your own compression jobs.</p>
+                        <p class="error-message">You don't have permission to access this file.</p>
                         <a href="/video" class="back-button">Return to Video Compressor</a>
                     </div>
                 </body>
                 </html>
             """), 403
         
+        # Rest of download logic remains the same...
         if file_index >= len(job['files']):
             return render_template_string("""
                 <!DOCTYPE html>
@@ -1010,13 +1168,29 @@ def register_video_routes(app, limiter):
             return jsonify({'error': 'File no longer exists on server'}), 404
     
     @app.route('/video/cleanup/<job_id>', methods=['DELETE'])
-    @login_required
     def cleanup_video_job(job_id):
         if job_id not in compression_jobs:
             return jsonify({'error': 'Job not found'}), 404
         
         job = compression_jobs[job_id]
-        if job.get('user') != session['user'] and session.get('role') != 'admin':
+        
+        # Same access control logic as other routes
+        job_user = job.get('user', 'guest')
+        current_user = session.get('user', 'guest')
+        is_admin = session.get('role') == 'admin'
+        is_guest_job = job.get('is_guest', False)
+        is_current_guest = 'user' not in session
+        
+        # Access control logic
+        access_granted = False
+        if is_admin:
+            access_granted = True
+        elif is_guest_job and is_current_guest:
+            access_granted = True
+        elif not is_guest_job and job_user == current_user:
+            access_granted = True
+        
+        if not access_granted:
             return jsonify({'error': 'Access denied'}), 403
         
         errors = []
@@ -1032,6 +1206,9 @@ def register_video_routes(app, limiter):
                 errors.append(f"Failed to delete files for {file_info['filename']}: {str(e)}")
         
         del compression_jobs[job_id]
+
+        # Save jobs to persistent storage after deletion
+        save_jobs(compression_jobs)
         
         if errors:
             return jsonify({'message': 'Job cleaned up with some errors', 'errors': errors}), 207

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
-{% block title %}Convert Image Formats Online - JPG PNG WebP Converter | resizeimages.co.in{% endblock %}
-{% block description %}Convert images between JPG, PNG, and WebP formats online. Free image format converter with batch processing support.{% endblock %}
+{% block title %}Free Image Converter - JPG, PNG, WebP Format Changer{% endblock %}
+{% block description %}Convert images to any format instantly! Change JPG to PNG, PNG to WebP, and more. Free online converter with batch processing - try it now!{% endblock %}
 {% block keywords %}convert images, image converter, jpg to png, png to jpg, webp converter, image format conversion{% endblock %}
 
 {% block hero %}
@@ -118,8 +118,9 @@
           </div>
 
           <div class="text-center mt-4">
-            <button type="submit" class="btn btn-warning btn-lg px-5">
-              <i class="fas fa-exchange-alt me-2"></i>Convert Images
+            <button type="button" class="btn btn-warning btn-lg px-5" id="convertBtn" onclick="this.disabled=true; this.querySelector('i').className='fas fa-spinner fa-spin me-2'; this.querySelector('span').textContent='Converting Images...'; this.style.backgroundColor='#6c757d'; setTimeout(() => document.getElementById('mainForm').submit(), 100);">
+              <i class="fas fa-exchange-alt me-2" id="convertIcon"></i>
+              <span id="convertBtnText">Convert Images</span>
             </button>
           </div>
         </form>
@@ -427,22 +428,62 @@
 }
 </style>
 
+<script src="{{ url_for('static', filename='js/common-functions.js') }}"></script>
 <script>
-// Download All functionality (existing)
-{% if all_downloads and all_downloads|length > 0 %}
-document.getElementById("downloadAll")?.addEventListener("click", function() {
-  const files = {{ all_downloads|tojson }};
-  files.forEach((url, i) => {
-    setTimeout(() => {
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = '';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }, i * 300);
-  });
+// Handle form submission loading state
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.getElementById('mainForm');
+  const convertBtn = document.getElementById('convertBtn');
+  const convertIcon = document.getElementById('convertIcon');
+  const convertBtnText = document.getElementById('convertBtnText');
+
+  if (form && convertBtn) {
+    form.addEventListener('submit', function(e) {
+      // Check if files are selected
+      const fileInput = document.getElementById('fileInput');
+      const remoteUrl = document.querySelector('input[name="remote_url"]');
+      const driveUrl = document.querySelector('input[name="drive_url"]');
+
+      const hasFiles = fileInput && fileInput.files && fileInput.files.length > 0;
+      const hasRemoteUrl = remoteUrl && remoteUrl.value.trim() !== '';
+      const hasDriveUrl = driveUrl && driveUrl.value.trim() !== '';
+
+      if (!hasFiles && !hasRemoteUrl && !hasDriveUrl) {
+        e.preventDefault();
+        alert('Please select images to convert or provide a URL.');
+        return false;
+      }
+
+      // Show loading state immediately
+      convertBtn.disabled = true;
+      convertIcon.className = 'fas fa-spinner fa-spin me-2';
+      convertBtnText.textContent = 'Converting Images...';
+      convertBtn.classList.add('btn-secondary');
+      convertBtn.classList.remove('btn-warning');
+    });
+  }
 });
+
+// Download All functionality
+{% if all_downloads and all_downloads|length > 0 %}
+const downloadAllBtn = document.getElementById("downloadAll");
+if (downloadAllBtn) {
+  // Store files data in a way that doesn't break JS parsing
+  const filesData = JSON.parse('{{ all_downloads|tojson|safe }}');
+
+  downloadAllBtn.addEventListener("click", function() {
+    filesData.forEach((url, i) => {
+      setTimeout(() => {
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = '';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }, i * 300);
+    });
+  });
+}
 {% endif %}
 
 // Share functionality variables
@@ -514,4 +555,23 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
   </div>
 </div>
+
+<!-- Related Tools Cross-Promotion -->
+<div class="row mt-5">
+  <div class="col-12">
+    <div class="card bg-light border-0">
+      <div class="card-body text-center py-4">
+        <h4 class="mb-3">💡 Next Step: Optimize Your Converted Images</h4>
+        <p class="text-muted mb-3">Reduce file size by up to 80% after format conversion without losing quality!</p>
+        <a href="/compress" class="btn btn-success btn-lg me-3" title="Compress your converted images to reduce file size">
+          <i class="fas fa-compress me-2"></i><strong>Compress Images</strong>
+        </a>
+        <a href="/resize" class="btn btn-outline-primary">
+          <i class="fas fa-expand-arrows-alt me-2"></i>Resize Images
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
 {% endblock %}

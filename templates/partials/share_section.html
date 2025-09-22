@@ -1,0 +1,46 @@
+<div class="card-footer bg-light">
+  <div class="row align-items-center">
+    <div class="col-md-4">
+      <a href="{{ action_url }}" class="btn btn-secondary">
+        <i class="fas fa-plus me-1"></i>{{ action|capitalize }} More Images
+      </a>
+    </div>
+    <div class="col-md-8">
+      <div class="d-flex justify-content-end align-items-center flex-wrap">
+        <div class="me-3 mb-2 mb-md-0">
+          <span class="text-muted">
+            <i class="fas fa-heart text-danger me-1 heartbeat-icon"></i>
+            <small>Loved it? Share with others!</small>
+          </span>
+        </div>
+        <div class="social-icons d-flex flex-wrap">
+          <button class="btn btn-sm btn-outline-primary me-2 mb-2" onclick="shareOnTwitter()">
+            <i class="fab fa-twitter"></i>
+          </button>
+          <button class="btn btn-sm btn-outline-primary me-2 mb-2" onclick="shareOnFacebook()">
+            <i class="fab fa-facebook"></i>
+          </button>
+          <button class="btn btn-sm btn-outline-primary me-2 mb-2" onclick="shareOnLinkedIn()">
+            <i class="fab fa-linkedin"></i>
+          </button>
+          <button class="btn btn-sm btn-outline-success me-2 mb-2" onclick="shareOnWhatsApp()">
+            <i class="fab fa-whatsapp"></i>
+          </button>
+          <button class="btn btn-sm btn-outline-danger me-2 mb-2" onclick="shareOnInstagram()">
+            <i class="fab fa-instagram"></i>
+          </button>
+          <button class="btn btn-sm btn-outline-secondary me-2 mb-2" onclick="shareByEmail()">
+            <i class="fas fa-envelope"></i>
+          </button>
+          <button class="btn btn-sm btn-outline-secondary me-2 mb-2" onclick="shareBySMS()">
+            <i class="fas fa-sms"></i>
+          </button>
+          <button class="btn btn-sm btn-outline-dark me-2 mb-2" onclick="copyPageLink()">
+            <i class="fas fa-link"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

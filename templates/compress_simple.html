@@ -1,0 +1,330 @@
+{% extends "base.html" %}
+
+{% block title %}Compress Images Online - Reduce JPG PNG WebP Size | resizeimages.co.in{% endblock %}
+{% block description %}Compress images online without quality loss. Reduce JPG, PNG, WebP file sizes by up to 80%. Fast, free, and secure image compression tool.{% endblock %}
+{% block keywords %}compress images, reduce image size, image compressor, photo optimization{% endblock %}
+
+{% block hero %}
+<div class="hero-section text-center">
+  <div class="container">
+    <h1 class="display-4 fw-bold mb-3">
+      <i class="fas fa-compress fa-lg me-3"></i>Compress Images
+    </h1>
+    <p class="lead mb-4">Reduce image file sizes without losing quality. Support for JPG, PNG, and WebP formats.</p>
+    <div class="row justify-content-center">
+      <div class="col-md-4">
+        <div class="card card-feature bg-white bg-opacity-10 border-0 text-white">
+          <div class="card-body text-center">
+            <i class="fas fa-magic fa-2x mb-2"></i>
+            <h5>Smart Compression</h5>
+            <p class="mb-0">Advanced algorithms maintain visual quality</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card card-feature bg-white bg-opacity-10 border-0 text-white">
+          <div class="card-body text-center">
+            <i class="fas fa-tachometer-alt fa-2x mb-2"></i>
+            <h5>Up to 80% Reduction</h5>
+            <p class="mb-0">Significant file size reduction</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card card-feature bg-white bg-opacity-10 border-0 text-white">
+          <div class="card-body text-center">
+            <i class="fas fa-shield-alt fa-2x mb-2"></i>
+            <h5>Secure & Private</h5>
+            <p class="mb-0">Files processed securely, auto-deleted</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card shadow-sm">
+      <div class="card-header bg-primary text-white">
+        <h3 class="card-title mb-0">
+          <i class="fas fa-compress me-2"></i>Image Compression Tool
+        </h3>
+      </div>
+      <div class="card-body">
+        <form id="mainForm" action="/compress" method="post" enctype="multipart/form-data">
+          <div id="dropArea" class="dropArea mb-3" onclick="document.getElementById('fileInput').click()">
+            <i class="fas fa-cloud-upload-alt fa-3x mb-2 text-muted"></i>
+            <p class="mb-2">Click or drag & drop images here</p>
+            <small class="text-muted">Supports JPG, PNG, WebP formats</small>
+          </div>
+          <input type="file" id="fileInput" name="images" accept="image/jpeg,image/jpg,image/png,image/webp" multiple style="display:none">
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Or paste direct image URL:</label>
+              <input class="form-control" type="url" name="remote_url" placeholder="https://example.com/image.jpg">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Or Google Drive share link:</label>
+              <input class="form-control" type="url" name="drive_url" placeholder="https://drive.google.com/...">
+            </div>
+          </div>
+
+          <div id="selectionInfo" class="selection-info mt-3" style="display:none;">
+            <div class="alert alert-info d-flex justify-content-between align-items-center">
+              <div>
+                <strong><span id="fileCount">0</span></strong> file(s) selected for compression
+              </div>
+              <button type="button" class="btn btn-sm btn-outline-danger" onclick="clearAllFiles()" title="Clear all files">
+                <i class="fas fa-times me-1"></i>Clear All
+              </button>
+            </div>
+            <div id="thumbnails" class="d-flex flex-wrap"></div>
+          </div>
+
+          <div class="text-center mt-4">
+            <button type="submit" class="btn btn-primary btn-lg px-5" id="compressBtn" disabled onclick="handleSubmit(this)">
+              <i class="fas fa-compress me-2" id="compressIcon"></i>
+              <span id="compressBtnText">Compress Images</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if results %}
+<!-- Guest Notice -->
+{% if guest_notice %}
+<div class="row justify-content-center mt-4">
+  <div class="col-lg-8">
+    <div class="alert alert-info">
+      <i class="fas fa-info-circle me-2"></i>{{ guest_notice }}
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<div class="row justify-content-center mt-4">
+  <div class="col-lg-8">
+    <div class="card shadow-sm">
+      <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+        <h4 class="mb-0">
+          <i class="fas fa-check-circle me-2"></i>Compression Results
+        </h4>
+        {% if all_downloads and all_downloads|length > 0 %}
+        <button id="downloadAll" class="btn btn-light btn-sm">
+          <i class="fas fa-download me-1"></i>Download All
+        </button>
+        {% endif %}
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>File Name</th>
+                <th>Original Size</th>
+                <th>Compressed Size</th>
+                <th>Reduction</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for r in results %}
+              <tr>
+                <td>
+                  {% if r.error %}
+                    <i class="fas fa-exclamation-triangle text-danger me-1"></i>{{ r.name }}
+                  {% else %}
+                    <i class="fas fa-file-image text-primary me-1"></i>{{ r.name }}
+                  {% endif %}
+                </td>
+                {% if r.error %}
+                <td colspan="4">
+                  <span class="text-danger">Error: {{ r.error }}</span>
+                </td>
+                {% else %}
+                <td>{{ r.original_size }}</td>
+                <td>{{ r.compressed_size }}</td>
+                <td>
+                  <span class="badge bg-success">{{ r.reduction }}</span>
+                </td>
+                <td>
+                  <a href="{{ r.download }}" class="btn btn-outline-primary btn-sm" download>
+                    <i class="fas fa-download me-1"></i>Download
+                  </a>
+                </td>
+                {% endif %}
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card-footer bg-light">
+        <div class="row align-items-center">
+          <div class="col-md-4">
+            <a href="/compress" class="btn btn-secondary">
+              <i class="fas fa-plus me-1"></i>Compress More Images
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('DOM loaded, initializing file handling...');
+
+  setupFileHandling();
+
+  // Download All functionality
+  {% if all_downloads and all_downloads|length > 0 %}
+  const downloadAllBtn = document.getElementById("downloadAll");
+  if (downloadAllBtn) {
+    const filesData = JSON.parse('{{ all_downloads|tojson|safe }}');
+    downloadAllBtn.addEventListener("click", function() {
+      filesData.forEach((url, i) => {
+        setTimeout(() => {
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = '';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }, i * 300);
+      });
+    });
+  }
+  {% endif %}
+});
+
+function setupFileHandling() {
+  const fileInput = document.getElementById('fileInput');
+  const dropArea = document.getElementById('dropArea');
+
+  if (!fileInput || !dropArea) {
+    console.error('Missing file input or drop area');
+    return;
+  }
+
+  // File input change
+  fileInput.addEventListener('change', function() {
+    console.log('Files selected:', this.files.length);
+    updateFileDisplay();
+  });
+
+  // Drag and drop
+  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    dropArea.addEventListener(eventName, preventDefaults, false);
+  });
+
+  function preventDefaults(e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+
+  ['dragenter', 'dragover'].forEach(eventName => {
+    dropArea.addEventListener(eventName, () => dropArea.classList.add('dragover'), false);
+  });
+
+  ['dragleave', 'drop'].forEach(eventName => {
+    dropArea.addEventListener(eventName, () => dropArea.classList.remove('dragover'), false);
+  });
+
+  dropArea.addEventListener('drop', function(e) {
+    const files = e.dataTransfer.files;
+    fileInput.files = files;
+    updateFileDisplay();
+  }, false);
+
+  console.log('File handling setup complete');
+}
+
+function updateFileDisplay() {
+  const selectionInfo = document.getElementById('selectionInfo');
+  const fileCount = document.getElementById('fileCount');
+  const thumbnails = document.getElementById('thumbnails');
+  const compressBtn = document.getElementById('compressBtn');
+  const fileInput = document.getElementById('fileInput');
+
+  const files = fileInput.files ? Array.from(fileInput.files) : [];
+
+  if (files.length === 0) {
+    selectionInfo.style.display = 'none';
+    compressBtn.disabled = true;
+    return;
+  }
+
+  selectionInfo.style.display = 'block';
+  fileCount.textContent = files.length;
+  compressBtn.disabled = false;
+
+  thumbnails.innerHTML = files.map((file, index) => `
+    <div class="file-item me-3 mb-2 p-2 border rounded bg-light">
+      <div class="d-flex align-items-center">
+        <i class="fas fa-file-image text-primary me-2"></i>
+        <div class="flex-grow-1">
+          <div class="fw-bold">${file.name}</div>
+          <small class="text-muted">${formatFileSize(file.size)}</small>
+        </div>
+        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeFile(${index})">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function removeFile(index) {
+  const fileInput = document.getElementById('fileInput');
+  const files = Array.from(fileInput.files);
+  files.splice(index, 1);
+
+  const dt = new DataTransfer();
+  files.forEach(file => dt.items.add(file));
+  fileInput.files = dt.files;
+
+  updateFileDisplay();
+}
+
+function clearAllFiles() {
+  document.getElementById('fileInput').value = '';
+  updateFileDisplay();
+}
+
+function formatFileSize(bytes) {
+  if (bytes === 0) return '0 Bytes';
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+function handleSubmit(btn) {
+  const fileInput = document.getElementById('fileInput');
+
+  if (!fileInput.files || fileInput.files.length === 0) {
+    alert('Please select image files first');
+    return false;
+  }
+
+  // Show loading state
+  btn.disabled = true;
+  btn.querySelector('i').className = 'fas fa-spinner fa-spin me-2';
+  btn.querySelector('span').textContent = 'Compressing Images...';
+  btn.style.backgroundColor = '#6c757d';
+
+  return true;
+}
+</script>
+
+{% endblock %}

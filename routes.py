@@ -3,7 +3,7 @@ import uuid
 import time
 import multiprocessing
 from concurrent.futures import ProcessPoolExecutor, as_completed
-from flask import render_template, send_from_directory, abort, jsonify, request, make_response, url_for
+from flask import render_template, send_from_directory, abort, jsonify, request, make_response, url_for, session
 
 from config import (
     MAX_FILE_MB, MAX_FILES, CV2_AVAILABLE, OUTPUT_ROOT, ADMIN_TOKEN,
@@ -31,7 +31,24 @@ def register_routes(app, limiter):
 
     @app.get('/compress')
     def compress_page():
-        resp = make_response(render_template('compress.html', config_max_mb=MAX_FILE_MB, max_files=MAX_FILES))
+        # Check authentication status
+        is_authenticated = 'user' in session
+
+        # Set limits based on authentication
+        if is_authenticated:
+            max_files = 20
+            max_mb = 25
+            max_total_mb = 250
+        else:
+            max_files = 3
+            max_mb = 10
+            max_total_mb = 30
+
+        resp = make_response(render_template('compress.html',
+                                          config_max_mb=max_mb,
+                                          max_files=max_files,
+                                          max_total_mb=max_total_mb,
+                                          is_authenticated=is_authenticated))
         sid, resp = get_session_id(resp)
         ensure_dirs(sid)
         return resp
@@ -39,6 +56,58 @@ def register_routes(app, limiter):
     @app.post('/compress')
     @limiter.limit('15 per minute')
     def compress_route():
+        # Check if user is authenticated
+        is_authenticated = 'user' in session
+
+        # For non-authenticated users, enforce restrictions
+        if not is_authenticated:
+            files = request.files.getlist('images')
+            valid_files = [f for f in files if f and f.filename]
+
+            # Check file count limit for guests (3 files only)
+            if len(valid_files) > 3:
+                return jsonify({
+                    'error': 'Guest users can only process 3 files at a time. Please log in for batch processing.',
+                    'login_required': True,
+                    'guest_limit_exceeded': True
+                }), 403
+
+            # Check file size limits for guests (10MB per file, 30MB total)
+            GUEST_MAX_SIZE_PER_FILE_MB = 10
+            GUEST_MAX_TOTAL_SIZE_MB = 30
+            GUEST_MAX_SIZE_PER_FILE_BYTES = GUEST_MAX_SIZE_PER_FILE_MB * 1024 * 1024
+            GUEST_MAX_TOTAL_SIZE_BYTES = GUEST_MAX_TOTAL_SIZE_MB * 1024 * 1024
+
+            total_size = 0
+            for file in valid_files:
+                if file.filename != '':
+                    # Get file size by seeking to end
+                    file.seek(0, 2)  # Seek to end
+                    file_size = file.tell()
+                    file.seek(0)  # Reset to beginning
+
+                    if file_size > GUEST_MAX_SIZE_PER_FILE_BYTES:
+                        file_size_mb = file_size / (1024 * 1024)
+                        return jsonify({
+                            'error': f'File "{file.filename}" is {file_size_mb:.1f}MB. Guest users can only process files up to {GUEST_MAX_SIZE_PER_FILE_MB}MB each. Please log in for larger files.',
+                            'login_required': True,
+                            'file_too_large': True,
+                            'file_size_mb': round(file_size_mb, 1),
+                            'max_size_mb': GUEST_MAX_SIZE_PER_FILE_MB
+                        }), 403
+
+                    total_size += file_size
+
+            if total_size > GUEST_MAX_TOTAL_SIZE_BYTES:
+                total_size_mb = total_size / (1024 * 1024)
+                return jsonify({
+                    'error': f'Total file size is {total_size_mb:.1f}MB. Guest users can only process up to {GUEST_MAX_TOTAL_SIZE_MB}MB total. Please log in for larger uploads.',
+                    'login_required': True,
+                    'total_size_exceeded': True,
+                    'total_size_mb': round(total_size_mb, 1),
+                    'max_total_mb': GUEST_MAX_TOTAL_SIZE_MB
+                }), 403
+
         sid, _ = get_session_id()
         _, out_dir = ensure_dirs(sid)
         selected, err = handle_source_inputs(sid)
@@ -94,7 +163,30 @@ def register_routes(app, limiter):
                 except Exception as ex_err:
                     results.append({'name': original_name, 'error': f"Processing failed: {str(ex_err)}"})
 
-        return render_template('compress.html', results=results, all_downloads=downloads, config_max_mb=MAX_FILE_MB, max_files=MAX_FILES)
+        # Set limits based on authentication for results page
+        if is_authenticated:
+            max_files = 20
+            max_mb = 25
+            max_total_mb = 250
+        else:
+            max_files = 3
+            max_mb = 10
+            max_total_mb = 30
+
+        template_vars = {
+            'results': results,
+            'all_downloads': downloads,
+            'config_max_mb': max_mb,
+            'max_files': max_files,
+            'max_total_mb': max_total_mb,
+            'is_authenticated': is_authenticated
+        }
+
+        # Add guest notice if processing was successful and user is guest
+        if not is_authenticated and results:
+            template_vars['guest_notice'] = 'You are using the service as a guest. Log in for batch processing and larger files.'
+
+        return render_template('compress.html', **template_vars)
 
     @app.get('/merge')
     def merge_page():

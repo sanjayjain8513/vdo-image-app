@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 
-{% block title %}Resize Images Online - Change Image Dimensions | resizeimages.co.in{% endblock %}
-{% block description %}Resize images online by percentage, exact dimensions, or fit within bounds. Maintain aspect ratio or set custom width and height for JPG, PNG, WebP images.{% endblock %}
-{% block keywords %}resize images, image resizer, change image size, resize photos, scale images, image dimensions, instagram square size, instagram portrait, Instagram story resize, Instagram landscape resize image, resize image facebook post, resize photo facebook cover, facebook profile, facebook story resize, twitter profile resize image, linkedin cover resize photo, twitter post image, twitter header image, linkedin cover image resize, youtube thumbnail resize image  {% endblock %}
+{% block title %}Free Image Resizer - Change Photo Dimensions Online{% endblock %}
+{% block description %}Resize images for free! Perfect for Instagram, Facebook, Twitter posts. Change photo dimensions instantly while maintaining quality. Supports JPG, PNG, WebP formats.{% endblock %}
+{% block keywords %}image resizer, photo dimensions, social media image sizes, resize photos{% endblock %}
 
 {% block hero %}
 <div class="hero-section text-center">
@@ -207,8 +207,9 @@
           </div>
 
           <div class="text-center mt-4">
-            <button type="submit" class="btn btn-info btn-lg px-5">
-              <i class="fas fa-expand-arrows-alt me-2"></i>Resize Images
+            <button type="button" class="btn btn-info btn-lg px-5" id="resizeBtn" onclick="this.disabled=true; this.querySelector('i').className='fas fa-spinner fa-spin me-2'; this.querySelector('span').textContent='Resizing Images...'; this.style.backgroundColor='#6c757d'; setTimeout(() => document.getElementById('mainForm').submit(), 100);">
+              <i class="fas fa-expand-arrows-alt me-2" id="resizeIcon"></i>
+              <span id="resizeBtnText">Resize Images</span>
             </button>
           </div>
         </form>
@@ -590,7 +591,28 @@
 }
 </style>
 
+<!-- Related Tools Cross-Promotion -->
+<div class="row mt-5">
+  <div class="col-12">
+    <div class="card bg-light border-0">
+      <div class="card-body text-center py-4">
+        <h4 class="mb-3">💡 Pro Tip: Optimize Your Resized Images</h4>
+        <p class="text-muted mb-3">After resizing, reduce file size by up to 80% without losing quality!</p>
+        <a href="/compress" class="btn btn-success btn-lg me-3" title="Compress your resized images to reduce file size">
+          <i class="fas fa-compress me-2"></i><strong>Compress Images</strong>
+        </a>
+        <a href="/convert" class="btn btn-outline-primary">
+          <i class="fas fa-exchange-alt me-2"></i>Convert Format
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/common-functions.js') }}"></script>
 <script>
+// Loading state now handled by inline onclick
+
 function updateResizeInputs() {
   const mode = document.getElementById('resizeMode').value;
   const val1Container = document.getElementById('val1').parentElement;
@@ -662,7 +684,7 @@ const selectionInfo = document.getElementById('selectionInfo');
 const fileCount = document.getElementById('fileCount');
 const thumbnails = document.getElementById('thumbnails');
 
-dropArea.addEventListener('click', () => fileInput.click());
+// Removed duplicate click handler - base.html setupDropArea handles this
 dropArea.addEventListener('dragover', (e) => {
   e.preventDefault();
   dropArea.classList.add('drag-over');
@@ -707,19 +729,24 @@ function updateFileSelection() {
 
 // Download All functionality
 {% if all_downloads and all_downloads|length > 0 %}
-document.getElementById("downloadAll")?.addEventListener("click", function() {
-  const files = {{ all_downloads|tojson }};
-  files.forEach((url, i) => {
-    setTimeout(() => {
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = '';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }, i * 300);
+const downloadAllBtn = document.getElementById("downloadAll");
+if (downloadAllBtn) {
+  // Store files data in a way that doesn't break JS parsing
+  const filesData = JSON.parse('{{ all_downloads|tojson|safe }}');
+
+  downloadAllBtn.addEventListener("click", function() {
+    filesData.forEach((url, i) => {
+      setTimeout(() => {
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = '';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }, i * 300);
+    });
   });
-});
+}
 {% endif %}
 
 // Initialize

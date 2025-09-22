@@ -1,0 +1,141 @@
+/* Crop page specific styles */
+.share-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50% !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  border-width: 1.5px !important;
+}
+
+.share-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.twitter-btn:hover {
+  background: #1da1f2 !important;
+  border-color: #1da1f2 !important;
+  color: white !important;
+}
+
+.facebook-btn:hover {
+  background: #4267B2 !important;
+  border-color: #4267B2 !important;
+  color: white !important;
+}
+
+.linkedin-btn:hover {
+  background: #0077b5 !important;
+  border-color: #0077b5 !important;
+  color: white !important;
+}
+
+.whatsapp-btn:hover {
+  background: #25d366 !important;
+  border-color: #25d366 !important;
+  color: white !important;
+}
+
+.instagram-btn:hover {
+  background: linear-gradient(45deg, #e4405f, #c13584) !important;
+  border-color: #e4405f !important;
+  color: white !important;
+}
+
+.more-btn:hover {
+  background: #6c757d !important;
+  border-color: #6c757d !important;
+  color: white !important;
+}
+
+.heartbeat-icon {
+  animation: heartbeat 2s ease-in-out infinite;
+}
+
+@keyframes heartbeat {
+  0% { transform: scale(1); }
+  14% { transform: scale(1.1); }
+  28% { transform: scale(1); }
+  42% { transform: scale(1.1); }
+  70% { transform: scale(1); }
+}
+
+@media (max-width: 768px) {
+  .share-icons {
+    justify-content: center;
+    margin-top: 10px;
+  }
+
+  .share-btn {
+    width: 32px;
+    height: 32px;
+  }
+
+  .col-md-4, .col-md-8 {
+    text-align: center;
+  }
+}
+
+.dropdown-menu {
+  border: none;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1) !important;
+}
+
+.dropdown-item {
+  transition: all 0.2s ease;
+  border-radius: 8px;
+  margin: 2px 8px;
+}
+
+.dropdown-item:hover {
+  background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+  transform: translateX(5px);
+}
+
+.dropArea {
+  border: 2px dashed #dee2e6;
+  border-radius: 8px;
+  padding: 40px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.dropArea:hover, .dropArea.dragover {
+  border-color: #198754;
+  background-color: #f8f9fa;
+}
+
+.dropArea:focus {
+  outline: 2px solid #198754;
+  outline-offset: 2px;
+}
+
+.thumbnail {
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  padding: 8px;
+  max-width: 150px;
+  text-align: center;
+}
+
+.preset-btn.active {
+  background-color: #198754;
+  border-color: #198754;
+  color: white;
+}
+
+#cropPreview {
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

@@ -170,8 +170,9 @@
             </div>
 
             <div class="text-center mt-4">
-              <button type="submit" class="btn btn-primary btn-lg">
-                <i class="fas fa-eye-slash me-2"></i>Blur Images
+              <button type="button" class="btn btn-primary btn-lg" id="blurBtn" onclick="this.disabled=true; this.querySelector('i').className='fas fa-spinner fa-spin me-2'; this.querySelector('span').textContent='Blurring Images...'; this.style.backgroundColor='#6c757d'; setTimeout(() => document.getElementById('mainForm').submit(), 100);">
+                <i class="fas fa-eye-slash me-2" id="blurIcon"></i>
+                <span id="blurBtnText">Blur Images</span>
               </button>
             </div>
           </fieldset>
@@ -488,22 +489,62 @@
 }
 </style>
 
+<script src="{{ url_for('static', filename='js/common-functions.js') }}"></script>
 <script>
+// Handle form submission loading state
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.getElementById('mainForm');
+  const blurBtn = document.getElementById('blurBtn');
+  const blurIcon = document.getElementById('blurIcon');
+  const blurBtnText = document.getElementById('blurBtnText');
+
+  if (form && blurBtn) {
+    form.addEventListener('submit', function(e) {
+      // Check if files are selected
+      const fileInput = document.getElementById('fileInput');
+      const remoteUrl = document.querySelector('input[name="remote_url"]');
+      const driveUrl = document.querySelector('input[name="drive_url"]');
+
+      const hasFiles = fileInput && fileInput.files && fileInput.files.length > 0;
+      const hasRemoteUrl = remoteUrl && remoteUrl.value.trim() !== '';
+      const hasDriveUrl = driveUrl && driveUrl.value.trim() !== '';
+
+      if (!hasFiles && !hasRemoteUrl && !hasDriveUrl) {
+        e.preventDefault();
+        alert('Please select images to blur or provide a URL.');
+        return false;
+      }
+
+      // Show loading state immediately
+      blurBtn.disabled = true;
+      blurIcon.className = 'fas fa-spinner fa-spin me-2';
+      blurBtnText.textContent = 'Blurring Images...';
+      blurBtn.classList.add('btn-secondary');
+      blurBtn.classList.remove('btn-primary');
+    });
+  }
+});
+
 // Download All functionality
 {% if all_downloads and all_downloads|length > 0 %}
-document.getElementById("downloadAll")?.addEventListener("click", function() {
-  const files = {{ all_downloads|tojson }};
-  files.forEach((url, i) => {
-    setTimeout(() => {
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = '';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }, i * 300);
+const downloadAllBtn = document.getElementById("downloadAll");
+if (downloadAllBtn) {
+  // Store files data in a way that doesn't break JS parsing
+  const filesData = JSON.parse('{{ all_downloads|tojson|safe }}');
+
+  downloadAllBtn.addEventListener("click", function() {
+    filesData.forEach((url, i) => {
+      setTimeout(() => {
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = '';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }, i * 300);
+    });
   });
-});
+}
 {% endif %}
 
 // Share functionality variables

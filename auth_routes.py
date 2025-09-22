@@ -7,7 +7,8 @@ from flask import render_template, request, jsonify, session, redirect, url_for,
 from functools import wraps
 
 # Use the correct path for users file
-USERS_FILE = 'users.json'
+# Import USERS_FILE from config which now includes persistent data directory
+from config import USERS_FILE
 
 def load_users():
     """Load users from JSON file"""

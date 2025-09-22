@@ -12,6 +12,7 @@
     </h1>
     <p class="lead mb-4">Compress MP4, AVI, MOV, MKV videos while preserving quality. Advanced video optimization with timestamps preservation.</p>
     <div class="row justify-content-center">
+        
       <div class="col-md-4">
         <div class="card card-feature bg-white bg-opacity-10 border-0 text-white">
           <div class="card-body text-center">
@@ -45,23 +46,11 @@
 {% endblock %}
 
 {% block content %}
-<!-- Authentication Check (initially hidden, shown by JS if needed) -->
-<div id="authRequired" class="row justify-content-center" style="display: none;">
-  <div class="col-lg-8">
-    <div class="alert alert-warning text-center">
-      <h4><i class="fas fa-lock me-2"></i>Authentication Required</h4>
-      <p class="mb-3">Video compression requires user authentication for security and resource management.</p>
-      <a href="/login" class="btn btn-primary btn-lg">
-        <i class="fas fa-sign-in-alt me-2"></i>Login to Continue
-      </a>
-    </div>
-  </div>
-</div>
-
-<!-- Main Upload Interface (shown by default, hidden by JS if not authenticated) -->
-<div id="uploadInterface">
-  <div class="row justify-content-center">
-    <div class="col-lg-8">
+<!-- Main Upload Interface -->
+<div class="container">
+  <div id="uploadInterface">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
       <div class="card shadow-sm">
         <div class="card-header bg-primary text-white">
           <h3 class="card-title mb-0">
@@ -69,11 +58,8 @@
           </h3>
         </div>
         <div class="card-body">
-          <div class="mb-3 text-muted">
-            <strong>Upload constraints:</strong>
-            Max files: <span class="badge bg-secondary">10</span>,
-            Types: <span class="badge bg-secondary">MP4, AVI, MOV, MKV, WMV, FLV, WebM</span>,
-            Max size per file: <span class="badge bg-secondary">1 GB</span>
+          <div id="constraintsInfo" class="mb-3 text-muted">
+            <!-- Constraints will be populated by JavaScript -->
           </div>
 
           <form id="videoForm" enctype="multipart/form-data">
@@ -90,8 +76,13 @@
                    style="display:none">
 
             <div id="selectionInfo" class="selection-info mt-3" style="display:none;">
-              <div class="alert alert-info">
-                <strong><span id="fileCount">0</span></strong> file(s) selected for compression
+              <div class="alert alert-info d-flex justify-content-between align-items-center">
+                <div>
+                  <strong><span id="fileCount">0</span></strong> file(s) selected for compression
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-danger" onclick="clearAllFiles()" title="Clear all files">
+                  <i class="fas fa-times me-1"></i>Clear All
+                </button>
               </div>
               <div id="thumbnails" class="d-flex flex-wrap"></div>
             </div>
@@ -171,19 +162,17 @@
             <i class="fas fa-cogs me-2"></i>Processing Videos
           </h4>
         </div>
-        <div class="card-body">
-          <div class="container-fluid px-0">
-            <div id="progressList">
-              <!-- Progress items will be populated here -->
-            </div>
-            
-            <!-- Download URLs Section -->
-            <div id="downloadUrls" class="mt-4" style="display: none;">
-              <div class="alert alert-success">
-                <h5 class="text-center"><i class="fas fa-link me-2"></i>Permanent Download Links</h5>
-                <p class="mb-3 text-center">Save these links to download your files anytime:</p>
-                <div id="urlList"></div>
-              </div>
+        <div class="card-body p-0">
+          <div id="progressList">
+            <!-- Progress items will be populated here -->
+          </div>
+          
+          <!-- Download URLs Section -->
+          <div id="downloadUrls" class="mt-4 p-3" style="display: none;">
+            <div class="alert alert-success">
+              <h5 class="text-center"><i class="fas fa-link me-2"></i>Permanent Download Links</h5>
+              <p class="mb-3 text-center">Save these links to download your files anytime:</p>
+              <div id="urlList"></div>
             </div>
           </div>
         </div>
@@ -201,6 +190,132 @@
         <p class="text-muted mt-2">
           <small>Files are automatically deleted after 1 hour for security</small>
         </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Share Section -->
+  <div class="row justify-content-center mt-4" id="shareSection" style="display: none;">
+    <div class="col-lg-8">
+      <div class="card shadow-sm">
+        <div class="card-footer bg-light">
+          <div class="row align-items-center">
+            <!-- Compress More Button -->
+            <div class="col-md-4">
+              <a href="/video" class="btn btn-secondary">
+                <i class="fas fa-plus me-1"></i>Compress More Videos
+              </a>
+            </div>
+            
+            <!-- Share Section -->
+            <div class="col-md-8">
+              <div class="d-flex justify-content-end align-items-center flex-wrap">
+                <!-- "Loved it?" Message -->
+                <div class="me-3 mb-2 mb-md-0">
+                  <span class="text-muted">
+                    <i class="fas fa-heart text-danger me-1 heartbeat-icon"></i>
+                    <small>Loved it? Share with others!</small>
+                  </span>
+                </div>
+                
+                <!-- Individual Share Icons with SVG -->
+                <div class="share-icons d-flex gap-2 align-items-center">
+                  <!-- Twitter -->
+                  <button class="btn btn-outline-primary btn-sm share-btn twitter-btn" 
+                          onclick="shareOnTwitter()" 
+                          title="Share on Twitter"
+                          aria-label="Share on Twitter"
+                          data-bs-toggle="tooltip">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                    </svg>
+                  </button>
+                  
+                  <!-- Facebook -->
+                  <button class="btn btn-outline-primary btn-sm share-btn facebook-btn" 
+                          onclick="shareOnFacebook()" 
+                          title="Share on Facebook"
+                          aria-label="Share on Facebook"
+                          data-bs-toggle="tooltip">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                    </svg>
+                  </button>
+                  
+                  <!-- LinkedIn -->
+                  <button class="btn btn-outline-info btn-sm share-btn linkedin-btn" 
+                          onclick="shareOnLinkedIn()" 
+                          title="Share on LinkedIn"
+                          aria-label="Share on LinkedIn"
+                          data-bs-toggle="tooltip">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                      <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                    </svg>
+                  </button>
+                  
+                  <!-- WhatsApp -->
+                  <button class="btn btn-outline-success btn-sm share-btn whatsapp-btn" 
+                          onclick="shareOnWhatsApp()" 
+                          title="Share on WhatsApp"
+                          aria-label="Share on WhatsApp"
+                          data-bs-toggle="tooltip">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.890-5.335 11.893-11.893A11.821 11.821 0 0020.531 3.488"/>
+                    </svg>
+                  </button>
+                  
+                  <!-- Instagram -->
+                  <button class="btn btn-outline-danger btn-sm share-btn instagram-btn" 
+                          onclick="shareOnInstagram()" 
+                          title="Share on Instagram"
+                          aria-label="Share on Instagram"
+                          data-bs-toggle="tooltip">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                    </svg>
+                  </button>
+                  
+                  <!-- More Options Dropdown -->
+                  <div class="btn-group">
+                    <button type="button" 
+                            class="btn btn-outline-secondary btn-sm dropdown-toggle share-btn more-btn" 
+                            data-bs-toggle="dropdown" 
+                            aria-expanded="false"
+                            title="More sharing options"
+                            aria-label="More sharing options"
+                            data-bs-original-title="More sharing options">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>
+                      </svg>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                      <li><h6 class="dropdown-header text-primary">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 4px;">
+                          <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/>
+                        </svg>More Options
+                      </h6></li>
+                      <li><a class="dropdown-item" href="#" onclick="copyToClipboard()" role="button" aria-label="Copy link to clipboard">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px;" aria-hidden="true">
+                          <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                        </svg>Copy Link
+                      </a></li>
+                      <li><a class="dropdown-item" href="#" onclick="shareViaEmail()" role="button" aria-label="Share via email">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px;" aria-hidden="true">
+                          <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                        </svg>Email
+                      </a></li>
+                      <li><a class="dropdown-item" href="#" onclick="shareViaSMS()" role="button" aria-label="Share via SMS">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 8px;" aria-hidden="true">
+                          <path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h4l4 4 4-4h4c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
+                        </svg>SMS
+                      </a></li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -235,26 +350,75 @@
   transform: scale(1.02);
 }
 
+.dropArea.guest-mode {
+  border-color: #17a2b8;
+  background: linear-gradient(135deg, #e3f7fa, #e0f2f1);
+}
+
 .file-item {
   max-width: 300px;
+}
+
+.file-size-warning {
+  color: #dc3545;
+  font-size: 0.8em;
+  margin-top: 5px;
+  font-weight: bold;
+}
+
+.badge.bg-warning {
+  color: #000 !important;
+}
+
+.guest-notice {
+  background: linear-gradient(135deg, #17a2b8, #138496);
+  color: white;
+  padding: 15px 20px;
+  margin: 20px 0;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
 #progressList {
   display: flex;
   flex-direction: column;
-  align-items: center;
   width: 100%;
-  padding: 0;
+  padding: 15px;
+  box-sizing: border-box;
+}
+
+#progressList .progress-item:first-child {
+  margin-top: 0;
+}
+
+#progressList .progress-item:last-child {
+  margin-bottom: 0;
+}
+
+/* Ensure proper card alignment */
+#progressSection .card {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+#progressSection .card-body {
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .progress-item {
   background: white;
   border-radius: 10px;
-  margin: 15px 0;
+  margin: 10px 0;
   box-shadow: 0 2px 10px rgba(0,0,0,0.1);
   overflow: hidden;
   width: 100%;
   max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
 }
 
 .progress-header {
@@ -265,6 +429,8 @@
   background: #f8f9fa;
   border-bottom: 1px solid #e9ecef;
   flex-wrap: wrap;
+  gap: 10px;
+  min-height: 60px;
 }
 
 .progress-filename {
@@ -273,6 +439,7 @@
   word-break: break-word;
   flex: 1;
   text-align: left;
+  min-width: 0;
 }
 
 .progress-status {
@@ -289,6 +456,10 @@
   font-size: 0.9em;
   color: #666;
   text-align: left;
+  flex: 1;
+  min-width: 0;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .url-item {
@@ -362,9 +533,120 @@
   color: #20c997;
   text-decoration: underline;
 }
+
+/* Share button styles */
+.share-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50% !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  border-width: 1.5px !important;
+}
+
+.share-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Platform-specific hover effects with brand colors */
+.twitter-btn:hover {
+  background: #1da1f2 !important;
+  border-color: #1da1f2 !important;
+  color: white !important;
+}
+
+.facebook-btn:hover {
+  background: #4267B2 !important;
+  border-color: #4267B2 !important;
+  color: white !important;
+}
+
+.linkedin-btn:hover {
+  background: #0077b5 !important;
+  border-color: #0077b5 !important;
+  color: white !important;
+}
+
+.whatsapp-btn:hover {
+  background: #25d366 !important;
+  border-color: #25d366 !important;
+  color: white !important;
+}
+
+.instagram-btn:hover {
+  background: linear-gradient(45deg, #e4405f, #c13584) !important;
+  border-color: #e4405f !important;
+  color: white !important;
+}
+
+.more-btn:hover {
+  background: #6c757d !important;
+  border-color: #6c757d !important;
+  color: white !important;
+}
+
+/* Pulse animation for heart icon */
+.heartbeat-icon {
+  animation: heartbeat 2s ease-in-out infinite;
+}
+
+@keyframes heartbeat {
+  0% { transform: scale(1); }
+  14% { transform: scale(1.1); }
+  28% { transform: scale(1); }
+  42% { transform: scale(1.1); }
+  70% { transform: scale(1); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .share-icons {
+    justify-content: center;
+    margin-top: 10px;
+  }
+  
+  .share-btn {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .col-md-4, .col-md-8 {
+    text-align: center;
+  }
+}
+
+/* Dropdown styling */
+.dropdown-menu {
+  border: none;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1) !important;
+}
+
+.dropdown-item {
+  transition: all 0.2s ease;
+  border-radius: 8px;
+  margin: 2px 8px;
+}
+
+.dropdown-item:hover {
+  background: linear-gradient(45deg, #f8f9fa, #e9ecef);
+  transform: translateX(5px);
+}
 </style>
 
+<script src="{{ url_for('static', filename='js/common-functions.js') }}"></script>
 <script>
+// Share functionality variables
+const shareUrl = window.location.href;
+const shareTitle = "Compress Videos Online - resizeimages.co.in";
+const shareText = "I just compressed my videos using this amazing free online tool! Check it out:";
+
 let currentJobId = null;
 let statusInterval = null;
 let selectedFiles = [];
@@ -390,21 +672,64 @@ async function checkAuthAndSetup() {
     
     isAuthenticated = data.authenticated;
     
-    if (!isAuthenticated) {
-      // Show login required message and hide upload interface
-      document.getElementById('authRequired').style.display = 'block';
-      document.getElementById('uploadInterface').style.display = 'none';
-      return;
+    if (isAuthenticated) {
+      // User is authenticated - enable full features
+      setupAuthenticatedInterface();
+    } else {
+      // User is guest - enable limited features
+      setupGuestInterface();
     }
     
-    // User is authenticated, setup the interface
-    setupInterface();
-    
   } catch (error) {
-    console.error('Auth check failed, assuming not authenticated:', error);
-    // On error, still show interface but handle auth failures in form submission
-    setupInterface();
+    console.error('Auth check failed, enabling guest mode:', error);
+    isAuthenticated = false;
+    setupGuestInterface();
   }
+}
+
+function setupAuthenticatedInterface() {
+  // Update upload constraints display
+  const constraintsDiv = document.getElementById('constraintsInfo');
+  constraintsDiv.innerHTML = `
+    <strong>Upload constraints:</strong>
+    Max files: <span class="badge bg-secondary">10</span>,
+    Types: <span class="badge bg-secondary">MP4, AVI, MOV, MKV, WMV, FLV, WebM</span>,
+    Max size per file: <span class="badge bg-secondary">1 GB</span>
+  `;
+  
+  setupInterface();
+}
+
+function setupGuestInterface() {
+  // Update upload constraints for guests
+  const constraintsDiv = document.getElementById('constraintsInfo');
+  constraintsDiv.innerHTML = `
+    <div class="alert alert-info mb-3">
+      <strong><i class="fas fa-info-circle me-2"></i>Guest Mode:</strong>
+      Upload 1 video file up to 50MB. 
+      <a href="/login" class="alert-link">Login for unlimited batch processing →</a>
+    </div>
+    <strong>Guest constraints:</strong>
+    Max files: <span class="badge bg-warning">1</span>,
+    Types: <span class="badge bg-secondary">MP4, AVI, MOV, MKV, WMV, FLV, WebM</span>,
+    Max size per file: <span class="badge bg-warning">50 MB</span>
+  `;
+  
+  // Update drop area text for guests
+  const dropArea = document.getElementById('dropArea');
+  dropArea.classList.add('guest-mode');
+  dropArea.innerHTML = `
+    <i class="fas fa-cloud-upload-alt fa-3x mb-2 text-muted"></i>
+    <p class="mb-2"><strong>Guest Mode:</strong> Click or drag & drop 1 video file here (max 50MB)</p>
+    <small class="text-muted">Supports MP4, AVI, MOV, MKV, WMV, FLV, WebM formats</small>
+    <div class="mt-2">
+      <a href="/login" class="btn btn-outline-primary btn-sm">
+        <i class="fas fa-sign-in-alt me-1"></i>Login for Full Features
+      </a>
+    </div>
+  `;
+  
+  setupInterface();
 }
 
 function setupInterface() {
@@ -482,14 +807,79 @@ function setupVideoDropArea() {
 
 function addFiles(files) {
   const validExtensions = ['mp4', 'avi', 'mov', 'mkv', 'wmv', 'flv', 'webm'];
-  const validFiles = files.filter(file => {
+  
+  // Filter valid files
+  let validFiles = files.filter(file => {
     const extension = file.name.split('.').pop().toLowerCase();
-    const size = file.size <= 1024 * 1024 * 1024; // 1GB limit
-    return validExtensions.includes(extension) && size;
+    const sizeLimit = isAuthenticated ? (1024 * 1024 * 1024) : (50 * 1024 * 1024); // 1GB or 50MB
+    return validExtensions.includes(extension) && file.size <= sizeLimit;
   });
 
-  selectedFiles = validFiles.slice(0, 10); // Max 10 files
+  // Check guest limitations
+  if (!isAuthenticated) {
+    // Check file count for guests
+    if (selectedFiles.length > 0 || validFiles.length > 1) {
+      showGuestLimitModal('Guest users can only process 1 file at a time. Please log in for batch processing.');
+      return;
+    }
+    
+    // Check file size for guests
+    const oversizedFiles = files.filter(file => file.size > 50 * 1024 * 1024);
+    if (oversizedFiles.length > 0) {
+      const fileSizeMB = (oversizedFiles[0].size / (1024 * 1024)).toFixed(1);
+      showGuestLimitModal(`File "${oversizedFiles[0].name}" is ${fileSizeMB}MB. Guest users can only process files up to 50MB. Please log in for larger files.`);
+      return;
+    }
+  }
+
+  // Apply limits
+  const maxFiles = isAuthenticated ? 10 : 1;
+  selectedFiles = validFiles.slice(0, maxFiles);
+  
+  if (files.length > validFiles.length) {
+    alert(`Some files were filtered out due to size or format restrictions.`);
+  }
+  
   updateFileDisplay();
+}
+
+function showGuestLimitModal(message) {
+  const modal = document.createElement('div');
+  modal.className = 'modal fade show';
+  modal.style.display = 'block';
+  modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
+  modal.innerHTML = `
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <i class="fas fa-lock me-2 text-warning"></i>Guest Limit Reached
+          </h5>
+        </div>
+        <div class="modal-body">
+          <p>${message}</p>
+          <div class="alert alert-info">
+            <strong>Login Benefits:</strong>
+            <ul class="mb-0 mt-2">
+              <li>Process up to 10 files at once</li>
+              <li>Upload files up to 1GB each</li>
+              <li>Access to all compression levels</li>
+              <li>Permanent download links</li>
+            </ul>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="this.closest('.modal').remove()">
+            Continue as Guest
+          </button>
+          <a href="/login" class="btn btn-primary">
+            <i class="fas fa-sign-in-alt me-2"></i>Login Now
+          </a>
+        </div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
 }
 
 function updateFileDisplay() {
@@ -508,24 +898,41 @@ function updateFileDisplay() {
   fileCount.textContent = selectedFiles.length;
   compressBtn.disabled = false;
 
-  thumbnails.innerHTML = selectedFiles.map((file, index) => `
-    <div class="file-item me-3 mb-2 p-2 border rounded bg-light">
-      <div class="d-flex align-items-center">
-        <i class="fas fa-video text-primary me-2"></i>
-        <div class="flex-grow-1">
-          <div class="fw-bold">${file.name}</div>
-          <small class="text-muted">${formatFileSize(file.size)}</small>
+  thumbnails.innerHTML = selectedFiles.map((file, index) => {
+    const fileSizeMB = (file.size / (1024 * 1024)).toFixed(1);
+    let sizeWarning = '';
+    
+    // Show size warning for guests
+    if (!isAuthenticated && file.size > 50 * 1024 * 1024) {
+      sizeWarning = `<div class="file-size-warning">⚠ File too large for guests (${fileSizeMB}MB > 50MB limit)</div>`;
+    }
+    
+    return `
+      <div class="file-item me-3 mb-2 p-2 border rounded bg-light">
+        <div class="d-flex align-items-center">
+          <i class="fas fa-video text-primary me-2"></i>
+          <div class="flex-grow-1">
+            <div class="fw-bold">${file.name}</div>
+            <small class="text-muted">${formatFileSize(file.size)}</small>
+            ${sizeWarning}
+          </div>
+          <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeFile(${index})">
+            <i class="fas fa-times"></i>
+          </button>
         </div>
-        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeFile(${index})">
-          <i class="fas fa-times"></i>
-        </button>
       </div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 }
 
 function removeFile(index) {
   selectedFiles.splice(index, 1);
+  updateFileDisplay();
+}
+
+function clearAllFiles() {
+  selectedFiles = [];
+  document.getElementById('fileInput').value = '';
   updateFileDisplay();
 }
 
@@ -580,6 +987,23 @@ async function handleFormSubmit(e) {
         currentJobId = data.job_id;
         showProcessingSection();
         startStatusPolling();
+        
+        // Show guest notice if present
+        if (data.guest_notice) {
+          showToast(data.guest_notice, 'info');
+        }
+      } else if (xhr.status === 403) {
+        // Handle guest limit errors
+        try {
+          const data = JSON.parse(xhr.responseText);
+          if (data.login_required) {
+            showGuestLimitModal(data.error);
+          } else {
+            alert(data.error);
+          }
+        } catch (e) {
+          alert('Access denied');
+        }
       } else if (xhr.status === 401) {
         alert('Please login first to use video compression');
         window.location.href = '/login';
@@ -670,7 +1094,6 @@ function showDownloadUrls() {
   urlList.innerHTML = urlItems;
   downloadUrls.style.display = 'block';
 }
-
 function startStatusPolling() {
   statusInterval = setInterval(async () => {
     if (currentJobId) {
@@ -696,6 +1119,7 @@ async function checkJobStatus() {
       if (job.status === 'completed' || job.status === 'failed' || job.status === 'partially_completed') {
         clearInterval(statusInterval);
         document.getElementById('cleanupSection').style.display = 'block';
+        document.getElementById('shareSection').style.display = 'block';
       }
     }
   } catch (error) {
@@ -723,15 +1147,15 @@ function updateProgressDisplay(job) {
         </div>
         <div class="progress-details">
           ${file.status === 'completed' || file.status === 'skipped' ? `
-            <div class="row">
-              <div class="col-md-8">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
+              <div class="flex-grow-1 me-md-3">
                 <strong>Results:</strong><br>
                 Original: ${formatFileSize(file.original_size)} → 
                 Compressed: ${formatFileSize(file.compressed_size)}
                 ${file.compression_ratio > 0 ? `<span class="badge bg-success ms-2">${file.compression_ratio}% saved</span>` : '<span class="badge bg-warning ms-2">File kept as-is</span>'}
                 ${file.message ? `<br><small class="text-muted">${file.message}</small>` : ''}
               </div>
-              <div class="col-md-4 text-end">
+              <div class="mt-2 mt-md-0">
                 <a href="/video/download/${currentJobId}/${index}" class="download-link" target="_blank">
                   <i class="fas fa-download me-1"></i>Download Video
                 </a>
@@ -888,6 +1312,7 @@ function resetInterface() {
   document.getElementById('selectionInfo').style.display = 'none';
   document.getElementById('progressSection').style.display = 'none';
   document.getElementById('cleanupSection').style.display = 'none';
+  document.getElementById('shareSection').style.display = 'none';
   document.getElementById('uploadProgress').style.display = 'none';
   document.getElementById('compressBtn').disabled = true;
   
@@ -896,4 +1321,5 @@ function resetInterface() {
   }
 }
 </script>
+</div>
 {% endblock %}

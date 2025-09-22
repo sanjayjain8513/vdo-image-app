@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 
-{% block title %}Free Image Compressor - Reduce Photo Size by 80%{% endblock %}
-{% block description %}Compress images instantly for free! Reduce JPG, PNG, WebP file sizes by up to 80% without losing quality. Perfect for websites, social media, and email.{% endblock %}
-{% block keywords %}image compressor, photo compression, reduce file size, optimize images{% endblock %}
+{% block title %}Compress Images Online - Reduce JPG PNG WebP Size | resizeimages.co.in{% endblock %}
+{% block description %}Compress images online without quality loss. Reduce JPG, PNG, WebP file sizes by up to 80%. Fast, free, and secure image compression tool.{% endblock %}
+{% block keywords %}compress images, reduce image size, compress jpg, compress png, image compressor, photo compressor, reduce size of image with same quality, losslessquality photo, save google photos space, change image size without quality loss, jpegmini, imageresizer {% endblock %}
 
 {% block hero %}
 <div class="hero-section text-center">
@@ -54,12 +54,8 @@
         </h3>
       </div>
       <div class="card-body">
-        <div id="constraintsInfo" class="mb-3 text-muted">
-          <!-- Constraints will be populated by JavaScript -->
-        </div>
-
         <form id="mainForm" action="/compress" method="post" enctype="multipart/form-data">
-          <div id="dropArea" class="dropArea mb-3">
+          <div id="dropArea" class="dropArea mb-3" onclick="document.getElementById('fileInput').click()">
             <i class="fas fa-cloud-upload-alt fa-3x mb-2 text-muted"></i>
             <p class="mb-2">Click or drag & drop images here</p>
             <small class="text-muted">Supports JPG, PNG, WebP formats</small>
@@ -90,7 +86,7 @@
           </div>
 
           <div class="text-center mt-4">
-            <button type="submit" class="btn btn-primary btn-lg px-5" id="compressBtn" disabled>
+            <button type="submit" class="btn btn-primary btn-lg px-5" id="compressBtn" disabled onclick="handleSubmit(this)">
               <i class="fas fa-compress me-2" id="compressIcon"></i>
               <span id="compressBtnText">Compress Images</span>
             </button>
@@ -170,14 +166,17 @@
           </table>
         </div>
       </div>
+      <!-- ELEGANT CARD FOOTER WITH INDIVIDUAL SHARE ICONS -->
       <div class="card-footer bg-light">
         <div class="row align-items-center">
+          <!-- Compress More Button -->
           <div class="col-md-4">
             <a href="/compress" class="btn btn-secondary">
               <i class="fas fa-plus me-1"></i>Compress More Images
             </a>
           </div>
-
+          
+          <!-- Share Section -->
           <div class="col-md-8">
             <div class="d-flex justify-content-end align-items-center flex-wrap">
               <!-- "Loved it?" Message -->
@@ -187,12 +186,12 @@
                   <small>Loved it? Share with others!</small>
                 </span>
               </div>
-
+              
               <!-- Individual Share Icons with SVG -->
               <div class="share-icons d-flex gap-2 align-items-center">
                 <!-- Twitter -->
-                <button class="btn btn-outline-primary btn-sm share-btn twitter-btn"
-                        onclick="shareOnTwitter()"
+                <button class="btn btn-outline-primary btn-sm share-btn twitter-btn" 
+                        onclick="shareOnTwitter()" 
                         title="Share on Twitter"
                         aria-label="Share on Twitter"
                         data-bs-toggle="tooltip">
@@ -200,10 +199,10 @@
                     <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
                   </svg>
                 </button>
-
+                
                 <!-- Facebook -->
-                <button class="btn btn-outline-primary btn-sm share-btn facebook-btn"
-                        onclick="shareOnFacebook()"
+                <button class="btn btn-outline-primary btn-sm share-btn facebook-btn" 
+                        onclick="shareOnFacebook()" 
                         title="Share on Facebook"
                         aria-label="Share on Facebook"
                         data-bs-toggle="tooltip">
@@ -211,10 +210,10 @@
                     <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                   </svg>
                 </button>
-
+                
                 <!-- LinkedIn -->
-                <button class="btn btn-outline-info btn-sm share-btn linkedin-btn"
-                        onclick="shareOnLinkedIn()"
+                <button class="btn btn-outline-info btn-sm share-btn linkedin-btn" 
+                        onclick="shareOnLinkedIn()" 
                         title="Share on LinkedIn"
                         aria-label="Share on LinkedIn"
                         data-bs-toggle="tooltip">
@@ -222,10 +221,10 @@
                     <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
                   </svg>
                 </button>
-
+                
                 <!-- WhatsApp -->
-                <button class="btn btn-outline-success btn-sm share-btn whatsapp-btn"
-                        onclick="shareOnWhatsApp()"
+                <button class="btn btn-outline-success btn-sm share-btn whatsapp-btn" 
+                        onclick="shareOnWhatsApp()" 
                         title="Share on WhatsApp"
                         aria-label="Share on WhatsApp"
                         data-bs-toggle="tooltip">
@@ -233,10 +232,10 @@
                     <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.890-5.335 11.893-11.893A11.821 11.821 0 0020.531 3.488"/>
                   </svg>
                 </button>
-
+                
                 <!-- Instagram -->
-                <button class="btn btn-outline-danger btn-sm share-btn instagram-btn"
-                        onclick="shareOnInstagram()"
+                <button class="btn btn-outline-danger btn-sm share-btn instagram-btn" 
+                        onclick="shareOnInstagram()" 
                         title="Share on Instagram"
                         aria-label="Share on Instagram"
                         data-bs-toggle="tooltip">
@@ -244,12 +243,12 @@
                     <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
                   </svg>
                 </button>
-
+                
                 <!-- More Options Dropdown -->
                 <div class="btn-group">
-                  <button type="button"
-                          class="btn btn-outline-secondary btn-sm dropdown-toggle share-btn more-btn"
-                          data-bs-toggle="dropdown"
+                  <button type="button" 
+                          class="btn btn-outline-secondary btn-sm dropdown-toggle share-btn more-btn" 
+                          data-bs-toggle="dropdown" 
                           aria-expanded="false"
                           title="More sharing options"
                           aria-label="More sharing options"
@@ -289,7 +288,6 @@
     </div>
   </div>
 </div>
-{% endif %}
 
 <!-- SHARE FUNCTIONALITY AND STYLING -->
 <style>
@@ -367,12 +365,12 @@
     justify-content: center;
     margin-top: 10px;
   }
-
+  
   .share-btn {
     width: 32px;
     height: 32px;
   }
-
+  
   .col-md-4, .col-md-8 {
     text-align: center;
   }
@@ -425,11 +423,13 @@ const shareUrl = window.location.href;
 const shareTitle = "Reduce images size / Compress Images Online - resizeimages.co.in";
 const shareText = "I just compressed my images by over 50% and saved space on my devices using this amazing free online tool! Check it out:";
 
-// Global variables
+// Global variables for file management and authentication
+let selectedFiles = [];
 let isAuthenticated = false;
 
+// Initialize tooltips and ripple effects
 document.addEventListener('DOMContentLoaded', function() {
-  console.log('DOM loaded, initializing...');
+  console.log('DOM loaded, starting initialization...');
 
   checkAuthAndSetup();
 
@@ -439,19 +439,21 @@ document.addEventListener('DOMContentLoaded', function() {
     return new bootstrap.Tooltip(tooltipTriggerEl);
   });
 
+  // Loading state is now handled by inline onclick
+  
   // Add ripple effect to share buttons
   document.querySelectorAll('.share-btn').forEach(function(button) {
     button.addEventListener('click', function(e) {
       const ripple = document.createElement('span');
       ripple.classList.add('ripple');
       this.appendChild(ripple);
-
+      
       const rect = this.getBoundingClientRect();
       const size = Math.max(rect.width, rect.height);
       ripple.style.width = ripple.style.height = size + 'px';
       ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
       ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
-
+      
       setTimeout(function() {
         ripple.remove();
       }, 600);
@@ -462,7 +464,9 @@ document.addEventListener('DOMContentLoaded', function() {
   {% if all_downloads and all_downloads|length > 0 %}
   const downloadAllBtn = document.getElementById("downloadAll");
   if (downloadAllBtn) {
+    // Store files data in a way that doesn't break JS parsing
     const filesData = JSON.parse('{{ all_downloads|tojson|safe }}');
+
     downloadAllBtn.addEventListener("click", function() {
       filesData.forEach((url, i) => {
         setTimeout(() => {
@@ -478,103 +482,6 @@ document.addEventListener('DOMContentLoaded', function() {
   }
   {% endif %}
 });
-
-function setupFileHandling() {
-  const fileInput = document.getElementById('fileInput');
-  const dropArea = document.getElementById('dropArea');
-
-  if (!fileInput || !dropArea) {
-    console.error('Missing file input or drop area');
-    return;
-  }
-
-  // Remove all existing event listeners by cloning the element
-  const newDropArea = dropArea.cloneNode(true);
-  dropArea.parentNode.replaceChild(newDropArea, dropArea);
-
-  // Get the new reference
-  const freshDropArea = document.getElementById('dropArea');
-
-  // Add single click handler
-  freshDropArea.addEventListener('click', function(e) {
-    e.preventDefault();
-    e.stopPropagation();
-    fileInput.click();
-  });
-
-  // File input change
-  fileInput.addEventListener('change', function() {
-    console.log('Files selected:', this.files.length);
-    if (validateFiles(this.files)) {
-      updateFileDisplay();
-    }
-  });
-
-  // Add event listeners for URL inputs to enable compress button
-  const remoteUrlInput = document.querySelector('input[name="remote_url"]');
-  const driveUrlInput = document.querySelector('input[name="drive_url"]');
-
-  remoteUrlInput.addEventListener('input', function() {
-    updateUIForUrls();
-  });
-
-  driveUrlInput.addEventListener('input', function() {
-    updateUIForUrls();
-  });
-
-  // Drag and drop
-  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-    freshDropArea.addEventListener(eventName, preventDefaults, false);
-  });
-
-  function preventDefaults(e) {
-    e.preventDefault();
-    e.stopPropagation();
-  }
-
-  ['dragenter', 'dragover'].forEach(eventName => {
-    freshDropArea.addEventListener(eventName, () => freshDropArea.classList.add('dragover'), false);
-  });
-
-  ['dragleave', 'drop'].forEach(eventName => {
-    freshDropArea.addEventListener(eventName, () => freshDropArea.classList.remove('dragover'), false);
-  });
-
-  freshDropArea.addEventListener('drop', function(e) {
-    const files = e.dataTransfer.files;
-    if (validateFiles(files)) {
-      fileInput.files = files;
-      updateFileDisplay();
-    }
-  }, false);
-
-  // Form submit handler
-  const form = document.getElementById('mainForm');
-  const compressBtn = document.getElementById('compressBtn');
-
-  form.addEventListener('submit', function(e) {
-    const remoteUrl = document.querySelector('input[name="remote_url"]').value.trim();
-    const driveUrl = document.querySelector('input[name="drive_url"]').value.trim();
-    const hasFiles = fileInput.files && fileInput.files.length > 0;
-    const hasUrls = remoteUrl || driveUrl;
-
-    if (!hasFiles && !hasUrls) {
-      e.preventDefault();
-      alert('Please select image files or paste a valid image URL');
-      return;
-    }
-
-    // Show loading state
-    compressBtn.disabled = true;
-    compressBtn.querySelector('i').className = 'fas fa-spinner fa-spin me-2';
-    compressBtn.querySelector('span').textContent = 'Compressing Images...';
-    compressBtn.style.backgroundColor = '#6c757d';
-
-    // Form will submit normally
-  });
-
-  console.log('File handling setup complete');
-}
 
 async function checkAuthAndSetup() {
   try {
@@ -606,7 +513,7 @@ function setupAuthenticatedInterface() {
     Total size: <span class="badge bg-secondary">250 MB</span>
   `;
 
-  setupFileHandling();
+  setupInterface();
 }
 
 function setupGuestInterface() {
@@ -624,89 +531,140 @@ function setupGuestInterface() {
     Total size: <span class="badge bg-warning">30 MB</span>
   `;
 
-  setupFileHandling();
-
-  // Update drop area for guest mode after file handling is set up
+  // Update drop area for guests
   const dropArea = document.getElementById('dropArea');
   dropArea.classList.add('guest-mode');
-
-  // Find and update the paragraph text
-  const paragraphs = dropArea.querySelectorAll('p');
-  if (paragraphs.length > 0) {
-    paragraphs[0].innerHTML = '<strong>Guest Mode:</strong> Click or drag & drop up to 3 images here (max 30MB total)';
-  }
-
-  // Add login button if it doesn't exist
-  if (!dropArea.querySelector('.btn-outline-primary')) {
-    const loginDiv = document.createElement('div');
-    loginDiv.className = 'mt-2';
-    loginDiv.innerHTML = `
+  dropArea.setAttribute('onclick', 'document.getElementById(\"fileInput\").click()');
+  dropArea.innerHTML = `
+    <i class="fas fa-cloud-upload-alt fa-3x mb-2 text-muted"></i>
+    <p class="mb-2"><strong>Guest Mode:</strong> Click or drag & drop up to 3 images here (max 30MB total)</p>
+    <small class="text-muted">Supports JPG, PNG, WebP formats</small>
+    <div class="mt-2">
       <a href="/login" class="btn btn-outline-primary btn-sm">
         <i class="fas fa-sign-in-alt me-1"></i>Login for Full Features
       </a>
-    `;
-    dropArea.appendChild(loginDiv);
+    </div>
+  `;
+
+  setupInterface();
+}
+
+function setupInterface() {
+  setupImageDropArea();
+
+  // Setup compress button
+  const compressBtn = document.getElementById('compressBtn');
+  if (compressBtn) {
+    compressBtn.addEventListener('click', handleCompressSubmit);
   }
 }
 
-function validateFiles(files) {
-  const filesArray = Array.from(files);
-  const validExtensions = ['jpg', 'jpeg', 'png', 'webp'];
+function setupImageDropArea() {
+  const drop = document.getElementById('dropArea');
+  const input = document.getElementById('fileInput');
+  const count = document.getElementById('fileCount');
+  const thumbs = document.getElementById('thumbnails');
+  const form = document.getElementById('mainForm');
 
-  // Check file types
-  const invalidFiles = filesArray.filter(file => {
-    const extension = file.name.split('.').pop().toLowerCase();
-    return !validExtensions.includes(extension);
+  if (!drop || !input || !count || !thumbs || !form) {
+    console.error('Missing required elements');
+    return;
+  }
+
+  // Click handler will be added via onclick in HTML
+
+  // Simple file selection on input change
+  input.addEventListener('change', function() {
+    console.log('File input changed');
+    const files = Array.from(input.files);
+    addFiles(files);
   });
 
-  if (invalidFiles.length > 0) {
-    alert(`Invalid file types detected. Only JPG, PNG, and WebP files are allowed.`);
-    return false;
+  // Drag and drop events
+  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    drop.addEventListener(eventName, preventDefaults, false);
+  });
+
+  function preventDefaults(e) {
+    e.preventDefault();
+    e.stopPropagation();
   }
 
+  ['dragenter', 'dragover'].forEach(eventName => {
+    drop.addEventListener(eventName, highlight, false);
+  });
+
+  ['dragleave', 'drop'].forEach(eventName => {
+    drop.addEventListener(eventName, unhighlight, false);
+  });
+
+  function highlight(e) {
+    drop.classList.add('dragover');
+  }
+
+  function unhighlight(e) {
+    drop.classList.remove('dragover');
+  }
+
+  // Handle dropped files
+  drop.addEventListener('drop', handleDrop, false);
+
+  function handleDrop(e) {
+    const dt = e.dataTransfer;
+    const files = Array.from(dt.files);
+    console.log('Files dropped:', files.length);
+    addFiles(files);
+  }
+
+  console.log('Image drop area setup complete');
+}
+
+function addFiles(files) {
+  const validExtensions = ['jpg', 'jpeg', 'png', 'webp'];
+  const fileInput = document.getElementById('fileInput');
+
+  // Filter valid files
+  let validFiles = files.filter(file => {
+    const extension = file.name.split('.').pop().toLowerCase();
+    const sizeLimit = isAuthenticated ? (25 * 1024 * 1024) : (10 * 1024 * 1024); // 25MB or 10MB
+    return validExtensions.includes(extension) && file.size <= sizeLimit;
+  });
+
+  // Check guest limitations
   if (!isAuthenticated) {
-    // Guest mode validations
-    if (filesArray.length > 3) {
+    // Check file count for guests (3 files max)
+    if (validFiles.length > 3) {
       showGuestLimitModal('Guest users can only process 3 files at a time. Please log in for batch processing.');
-      return false;
+      return;
     }
 
-    // Check individual file sizes (10MB limit for guests)
-    const oversizedFiles = filesArray.filter(file => file.size > 10 * 1024 * 1024);
-    if (oversizedFiles.length > 0) {
-      showGuestLimitModal(`Some files exceed the 10MB limit for guest users. Please log in for larger file uploads.`);
-      return false;
-    }
+    // Check total size for guests (30MB max)
+    const totalSize = validFiles.reduce((sum, file) => sum + file.size, 0);
+    const maxTotalSize = 30 * 1024 * 1024; // 30MB
 
-    // Check total size (30MB limit for guests)
-    const totalSize = filesArray.reduce((sum, file) => sum + file.size, 0);
-    if (totalSize > 30 * 1024 * 1024) {
+    if (totalSize > maxTotalSize) {
       const totalSizeMB = (totalSize / (1024 * 1024)).toFixed(1);
       showGuestLimitModal(`Total file size is ${totalSizeMB}MB. Guest users can only process up to 30MB total. Please log in for larger uploads.`);
-      return false;
-    }
-  } else {
-    // Authenticated user validations
-    if (filesArray.length > 20) {
-      alert('Maximum 20 files allowed per upload.');
-      return false;
-    }
-
-    const oversizedFiles = filesArray.filter(file => file.size > 25 * 1024 * 1024);
-    if (oversizedFiles.length > 0) {
-      alert('Some files exceed the 25MB limit.');
-      return false;
-    }
-
-    const totalSize = filesArray.reduce((sum, file) => sum + file.size, 0);
-    if (totalSize > 250 * 1024 * 1024) {
-      const totalSizeMB = (totalSize / (1024 * 1024)).toFixed(1);
-      alert(`Total file size is ${totalSizeMB}MB. Maximum 250MB total allowed.`);
-      return false;
+      return;
     }
   }
 
-  return true;
+  // Apply limits
+  const maxFiles = isAuthenticated ? 20 : 3;
+  if (validFiles.length > maxFiles) {
+    validFiles = validFiles.slice(0, maxFiles);
+  }
+
+  if (files.length > validFiles.length) {
+    alert(`Some files were filtered out due to size or format restrictions.`);
+  }
+
+  // Update the file input with valid files
+  const dt = new DataTransfer();
+  validFiles.forEach(file => dt.items.add(file));
+  fileInput.files = dt.files;
+
+  updateFileDisplay();
 }
 
 function showGuestLimitModal(message) {
@@ -767,64 +725,41 @@ function updateFileDisplay() {
   fileCount.textContent = files.length;
   compressBtn.disabled = false;
 
-  thumbnails.innerHTML = files.map((file, index) => `
-    <div class="file-item me-3 mb-2 p-2 border rounded bg-light">
-      <div class="d-flex align-items-center">
-        <i class="fas fa-file-image text-primary me-2"></i>
-        <div class="flex-grow-1">
-          <div class="fw-bold">${file.name}</div>
-          <small class="text-muted">${formatFileSize(file.size)}</small>
-        </div>
-        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeFile(${index})">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-    </div>
-  `).join('');
-}
+  thumbnails.innerHTML = files.map((file, index) => {
+    const fileSizeMB = (file.size / (1024 * 1024)).toFixed(1);
+    let sizeWarning = '';
 
-function updateUIForUrls() {
-  const remoteUrl = document.querySelector('input[name="remote_url"]').value.trim();
-  const driveUrl = document.querySelector('input[name="drive_url"]').value.trim();
-  const fileInput = document.getElementById('fileInput');
-  const compressBtn = document.getElementById('compressBtn');
-  const selectionInfo = document.getElementById('selectionInfo');
-  const fileCount = document.getElementById('fileCount');
+    // Show size warning for guests
+    if (!isAuthenticated && file.size > 10 * 1024 * 1024) {
+      sizeWarning = `<div class="file-size-warning">⚠ File too large for guests (${fileSizeMB}MB > 10MB limit)</div>`;
+    }
 
-  const hasFiles = fileInput.files && fileInput.files.length > 0;
-  const hasUrls = remoteUrl || driveUrl;
-
-  if (hasUrls && !hasFiles) {
-    // Show selection info for URL input
-    selectionInfo.style.display = 'block';
-    fileCount.textContent = '1';
-    compressBtn.disabled = false;
-
-    // Clear thumbnails when using URLs
-    const thumbnails = document.getElementById('thumbnails');
-    thumbnails.innerHTML = `
+    return `
       <div class="file-item me-3 mb-2 p-2 border rounded bg-light">
         <div class="d-flex align-items-center">
-          <i class="fas fa-link text-success me-2"></i>
+          <i class="fas fa-file-image text-primary me-2"></i>
           <div class="flex-grow-1">
-            <div class="fw-medium">Image URL</div>
-            <small class="text-muted">${remoteUrl || driveUrl}</small>
+            <div class="fw-bold">${file.name}</div>
+            <small class="text-muted">${formatFileSize(file.size)}</small>
+            ${sizeWarning}
           </div>
+          <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeFile(${index})">
+            <i class="fas fa-times"></i>
+          </button>
         </div>
       </div>
     `;
-  } else if (!hasFiles && !hasUrls) {
-    // Reset UI when no input
-    selectionInfo.style.display = 'none';
-    compressBtn.disabled = true;
-  }
+  }).join('');
 }
 
 function removeFile(index) {
   const fileInput = document.getElementById('fileInput');
   const files = Array.from(fileInput.files);
+
+  // Remove file at index
   files.splice(index, 1);
 
+  // Update file input
   const dt = new DataTransfer();
   files.forEach(file => dt.items.add(file));
   fileInput.files = dt.files;
@@ -834,10 +769,7 @@ function removeFile(index) {
 
 function clearAllFiles() {
   document.getElementById('fileInput').value = '';
-  document.querySelector('input[name="remote_url"]').value = '';
-  document.querySelector('input[name="drive_url"]').value = '';
   updateFileDisplay();
-  updateUIForUrls();
 }
 
 function formatFileSize(bytes) {
@@ -848,6 +780,32 @@ function formatFileSize(bytes) {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 
+function handleCompressSubmit() {
+  const fileInput = document.getElementById('fileInput');
+
+  // Check if files are selected (using file input, not selectedFiles array)
+  if (!fileInput.files || fileInput.files.length === 0) {
+    alert('Please select image files first');
+    return;
+  }
+
+  // Update button state
+  const btn = document.getElementById('compressBtn');
+  btn.disabled = true;
+  btn.querySelector('i').className = 'fas fa-spinner fa-spin me-2';
+  btn.querySelector('span').textContent = 'Compressing Images...';
+  btn.style.backgroundColor = '#6c757d';
+
+  // Submit form after showing loading state
+  setTimeout(() => {
+    document.getElementById('mainForm').submit();
+  }, 100);
+}
+
+// Share functions are now in common-functions.js
 </script>
+{% endif %}
+
 
 {% endblock %}
+

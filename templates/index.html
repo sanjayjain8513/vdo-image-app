@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 
-{% block title %}Reduce Image size without loss in quality | ResizeImages.co.in{% endblock %}
+{% block title %}Free Image Optimizer - Compress & Resize Photos Online{% endblock %}
 
-{% block description %}Professional image optimization tools: compress images without quality loss, resize by pixels/percentage, convert formats, watermark, crop, merge & rotate.{% endblock %}
+{% block description %}Optimize your images for free! Compress, resize, convert, watermark, and edit photos instantly. No registration required - start processing images now!{% endblock %}
 
-{% block keywords %}image compressor online, photo resizer tool, compress images without quality loss, convert jpg to webp, png to jpg converter, image optimizer, photo compression tool, resize images online, resize for instagram, resize for facebook, resize for youtube, resize for twitter, resize for whatsapp, merge jpeg, jpg-jpg, jpeg merge, batch image processing, watermark photos, crop images online, rotate pictures, blur photos online, optimize images for web, reduce file size, image format converter{% endblock %}
+{% block keywords %}image compressor, photo resizer, image optimizer, online photo tools{% endblock %}
 
 {% block og_title %}Free Image Compressor & Photo Optimizer | Compress, Resize, Convert, Rotate, Crop, Watermark, Merge jpg Online{% endblock %}
 
@@ -18,14 +18,14 @@
         <img src="{{ url_for('static', filename='images/logo.png') }}" 
              alt="ResizeImages.co.in Logo" 
              class="logo-hero mb-3">
-        <h1 class="display-4 fw-bold mb-3">Professional Image Tools</h1>
-        <p class="lead mb-4">Complete suite of image processing tools. Free, fast, and secure. Process your images without uploading to any server.</p>
+        <h1 class="display-4 fw-bold mb-3">Free Image Compressor & Optimizer</h1>
+        <p class="lead mb-4">Reduce image file sizes by up to 80% without losing quality. Compress JPG, PNG, WebP images online. Perfect for websites, social media, and email attachments.</p>
         <div class="d-flex gap-3 justify-content-center flex-wrap">
-          <a href="/compress" class="btn btn-light btn-lg px-4">
-            <i class="fas fa-compress me-2"></i>Start Compressing
+          <a href="/compress" class="btn btn-light btn-lg px-5 py-3">
+            <i class="fas fa-compress me-2"></i><strong>Compress Images Now</strong>
           </a>
-          <a href="/resize" class="btn btn-outline-light btn-lg px-4">
-            <i class="fas fa-expand-arrows-alt me-2"></i>Resize Images
+          <a href="/video" class="btn btn-outline-light btn-lg px-4">
+            <i class="fas fa-video me-2"></i>Compress Videos
           </a>
         </div>
       </div>
@@ -35,131 +35,118 @@
 {% endblock %}
 
 {% block content %}
-<!-- Tools Section -->
+<!-- Featured Tool Section -->
 <div class="row mb-5">
   <div class="col-12">
-    <h2 class="text-center mb-4 fw-bold">Image Processing Tools</h2>
-    <p class="text-center text-muted mb-5">Choose the perfect tool for your image processing needs</p>
+    <h2 class="text-center mb-4 fw-bold">Tools</h2>
+    <p class="text-center text-muted mb-5">Professional compression and optimization tools</p>
   </div>
 </div>
 
 <div class="row g-4 mb-5">
-  <div class="col-lg-3 col-md-6">
+  <!-- FEATURED: Compress Images - Hero Tool -->
+  <div class="col-lg-6 col-md-12">
+    <div class="card h-100 shadow border-success card-feature" style="border-width: 2px !important;">
+      <div class="card-header bg-success text-white text-center">
+        <span class="badge bg-light text-success">⭐ MOST POPULAR</span>
+      </div>
+      <div class="card-body text-center p-4">
+        <div class="mb-3">
+          <i class="fas fa-compress fa-4x text-success"></i>
+        </div>
+        <h4 class="card-title fw-bold">Compress Images</h4>
+        <p class="card-text text-muted">Reduce file size by up to 80% without losing visual quality. Perfect for web optimization, email attachments, and saving storage space.</p>
+        <div class="d-grid gap-2">
+          <a href="/compress" class="btn btn-success btn-lg">
+            <i class="fas fa-compress me-2"></i><strong>Start Compressing Free</strong>
+          </a>
+          <small class="text-muted">✓ No registration required ✓ Secure processing</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Video Compression -->
+  <div class="col-lg-6 col-md-12">
+    <div class="card h-100 shadow border-danger card-feature" style="border-width: 2px !important;">
+      <div class="card-header bg-danger text-white text-center">
+        <span class="badge bg-light text-danger">🎥 TRENDING</span>
+      </div>
+      <div class="card-body text-center p-4">
+        <div class="mb-3">
+          <i class="fas fa-video fa-4x text-danger"></i>
+        </div>
+        <h4 class="card-title fw-bold">Compress Videos</h4>
+        <p class="card-text text-muted">Reduce video file sizes by up to 70% for MP4, AVI, MOV formats. Perfect for sharing, storage, and faster streaming.</p>
+        <div class="d-grid gap-2">
+          <a href="/video" class="btn btn-danger btn-lg">
+            <i class="fas fa-video me-2"></i><strong>Start Compressing Videos</strong>
+          </a>
+          <small class="text-muted">✓ Multiple formats supported ✓ High quality maintained</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Additional Tools Section -->
+<div class="row mb-5">
+  <div class="col-12">
+    <h3 class="text-center mb-4 fw-bold">More Image Tools</h3>
+  </div>
+</div>
+
+<div class="row g-4 mb-5 justify-content-center">
+  <div class="col-lg-4 col-md-6">
     <div class="card h-100 shadow-sm card-feature">
       <div class="card-body text-center p-4">
         <div class="mb-3">
           <i class="fas fa-expand-arrows-alt fa-3x text-primary"></i>
         </div>
         <h5 class="card-title fw-bold">Resize Images</h5>
-        <p class="card-text text-muted">Change image dimensions while maintaining quality. Perfect for web, social media, or print.</p>
+        <p class="card-text text-muted">Change image dimensions while maintaining quality. Perfect for social media posts.</p>
         <a href="/resize" class="btn btn-primary">
           <i class="fas fa-expand-arrows-alt me-1"></i>Resize Now
         </a>
       </div>
     </div>
   </div>
-  
-  <div class="col-lg-3 col-md-6">
-    <div class="card h-100 shadow-sm card-feature">
-      <div class="card-body text-center p-4">
-        <div class="mb-3">
-          <i class="fas fa-compress fa-3x text-success"></i>
-        </div>
-        <h5 class="card-title fw-bold">Compress Images</h5>
-        <p class="card-text text-muted">Reduce file size without losing visual quality. Optimize images for faster web loading.</p>
-        <a href="/compress" class="btn btn-success">
-          <i class="fas fa-compress me-1"></i>Compress Now
-        </a>
-      </div>
-    </div>
-  </div>
-  
-  <div class="col-lg-3 col-md-6">
+
+  <div class="col-lg-4 col-md-6">
     <div class="card h-100 shadow-sm card-feature">
       <div class="card-body text-center p-4">
         <div class="mb-3">
           <i class="fas fa-exchange-alt fa-3x text-info"></i>
         </div>
         <h5 class="card-title fw-bold">Convert Format</h5>
-        <p class="card-text text-muted">Convert between JPG, PNG, WebP, and other formats. Choose the best format for your needs.</p>
+        <p class="card-text text-muted">Convert between JPG, PNG, WebP formats. Optimize file formats for different use cases.</p>
         <a href="/convert" class="btn btn-info">
           <i class="fas fa-exchange-alt me-1"></i>Convert Now
         </a>
       </div>
     </div>
   </div>
-  
-  <div class="col-lg-3 col-md-6">
+
+  <div class="col-lg-4 col-md-6">
     <div class="card h-100 shadow-sm card-feature">
       <div class="card-body text-center p-4">
         <div class="mb-3">
-          <i class="fas fa-tint fa-3x text-warning"></i>
+          <i class="fas fa-tools fa-3x text-secondary"></i>
         </div>
-        <h5 class="card-title fw-bold">Add Watermark</h5>
-        <p class="card-text text-muted">Protect your images with custom watermarks. Add text or image watermarks with transparency.</p>
-        <a href="/watermark" class="btn btn-warning">
-          <i class="fas fa-tint me-1"></i>Watermark Now
-        </a>
-      </div>
-    </div>
-  </div>
-  
-  <div class="col-lg-3 col-md-6">
-    <div class="card h-100 shadow-sm card-feature">
-      <div class="card-body text-center p-4">
-        <div class="mb-3">
-          <i class="fas fa-layer-group fa-3x text-secondary"></i>
+        <h5 class="card-title fw-bold">More Tools</h5>
+        <p class="card-text text-muted">Crop, rotate, blur, watermark, and merge images. Explore all our image editing tools.</p>
+        <div class="dropdown">
+          <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+            <i class="fas fa-tools me-1"></i>Explore Tools
+          </button>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="/crop">Crop Images</a></li>
+            <li><a class="dropdown-item" href="/rotate">Rotate Images</a></li>
+            <li><a class="dropdown-item" href="/watermark">Add Watermarks</a></li>
+            <li><a class="dropdown-item" href="/blur">Blur Images</a></li>
+            <li><a class="dropdown-item" href="/merge">Merge Images</a></li>
+          </ul>
         </div>
-        <h5 class="card-title fw-bold">Merge Images</h5>
-        <p class="card-text text-muted">Combine multiple images into one. Create collages, side-by-side comparisons, or grids.</p>
-        <a href="/merge" class="btn btn-secondary">
-          <i class="fas fa-layer-group me-1"></i>Merge Now
-        </a>
-      </div>
-    </div>
-  </div>
-  
-  <div class="col-lg-3 col-md-6">
-    <div class="card h-100 shadow-sm card-feature">
-      <div class="card-body text-center p-4">
-        <div class="mb-3">
-          <i class="fas fa-eye-slash fa-3x text-dark"></i>
-        </div>
-        <h5 class="card-title fw-bold">Blur Images</h5>
-        <p class="card-text text-muted">Apply blur effects to images. Perfect for creating backgrounds or privacy protection.</p>
-        <a href="/blur" class="btn btn-dark">
-          <i class="fas fa-eye-slash me-1"></i>Blur Now
-        </a>
-      </div>
-    </div>
-  </div>
-  
-  <div class="col-lg-3 col-md-6">
-    <div class="card h-100 shadow-sm card-feature">
-      <div class="card-body text-center p-4">
-        <div class="mb-3">
-          <i class="fas fa-redo fa-3x text-danger"></i>
-        </div>
-        <h5 class="card-title fw-bold">Rotate Images</h5>
-        <p class="card-text text-muted">Rotate images by any angle. Fix orientation or create artistic rotated effects.</p>
-        <a href="/rotate" class="btn btn-danger">
-          <i class="fas fa-redo me-1"></i>Rotate Now
-        </a>
-      </div>
-    </div>
-  </div>
-  
-  <div class="col-lg-3 col-md-6">
-    <div class="card h-100 shadow-sm card-feature">
-      <div class="card-body text-center p-4">
-        <div class="mb-3">
-          <i class="fas fa-crop fa-3x text-success"></i>
-        </div>
-        <h5 class="card-title fw-bold">Crop Images</h5>
-        <p class="card-text text-muted">Crop images to focus on important areas. Remove unwanted parts or create custom aspect ratios.</p>
-        <a href="/crop" class="btn btn-success">
-          <i class="fas fa-crop me-1"></i>Crop Now
-        </a>
       </div>
     </div>
   </div>
@@ -180,8 +167,8 @@
         <div class="mb-3">
           <i class="fas fa-shield-alt fa-2x text-success"></i>
         </div>
-        <h5 class="fw-bold">100% Privacy</h5>
-        <p class="text-muted mb-0">Images processed locally in your browser. Never uploaded to servers.</p>
+        <h5 class="fw-bold">Secure Processing</h5>
+        <p class="text-muted mb-0">Your files are processed securely and automatically deleted after processing.</p>
       </div>
     </div>
   </div>
@@ -258,8 +245,8 @@
             <div class="mb-3">
               <i class="fas fa-upload fa-3x text-primary"></i>
             </div>
-            <h5 class="fw-bold">1. Upload Images</h5>
-            <p class="text-muted">Select or drag & drop up to 10 images. Supports JPG, PNG, WebP and more formats.</p>
+            <h5 class="fw-bold">1. Select Images</h5>
+            <p class="text-muted">Choose or drag & drop up to 10 images. Supports JPG, PNG, WebP and more formats.</p>
           </div>
           <div class="col-lg-4 mb-4">
             <div class="mb-3">

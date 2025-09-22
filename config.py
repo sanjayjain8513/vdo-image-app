@@ -7,21 +7,25 @@ ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png', 'webp'}
 MAX_FILE_MB = int(os.getenv('MAX_FILE_MB', '100'))
 MAX_FILES = int(os.getenv('MAX_FILES', '10'))
 MAX_FETCH_MB = int(os.getenv('MAX_FETCH_MB', '100'))  # remote download size limit (URL/Drive)
+# Persistent data directory - MUST be defined first
+DATA_DIR = os.getenv('DATA_DIR', 'data')
+os.makedirs(DATA_DIR, exist_ok=True)
+
 UPLOAD_ROOT = 'uploads'
 OUTPUT_ROOT = 'outputs'
 # Use any advanced compressor binary compatible with cjpeg arguments (e.g., mozjpeg's cjpeg)
 ADVANCED_COMPRESS_BIN = os.getenv('ADVANCED_COMPRESS_BIN', 'cjpeg')
 QUALITY = os.getenv('QUALITY', '85')  # fixed to avoid confusing users
 ADMIN_TOKEN = os.getenv('ADMIN_TOKEN', 'changeme')
-VISITOR_LOG = os.getenv('VISITOR_LOG', 'visitors.log')  # CSV: date,ip
+VISITOR_LOG = os.getenv('VISITOR_LOG', os.path.join(DATA_DIR, 'visitors.log'))  # CSV: date,ip
 
-# Processing limits - adaptive based on system resources
+# Processing limits - optimized for 2 vCPU/4GB system
 MAX_PIXELS = int(os.getenv('MAX_PIXELS', '150000000'))  # Maximum pixels allowed (150M)
-SAFE_PIXELS = int(os.getenv('SAFE_PIXELS', '25000000'))  # Safe processing limit based on available RAM
+SAFE_PIXELS = int(os.getenv('SAFE_PIXELS', '50000000'))  # Safe processing limit - doubled for 4GB RAM
 PROCESS_TIMEOUT = int(os.getenv('PROCESS_TIMEOUT', '300'))  # 5 minutes for large images
-MAX_WORKERS = int(os.getenv('MAX_WORKERS', '1'))  # Configurable worker count
+MAX_WORKERS = int(os.getenv('MAX_WORKERS', '2'))  # 2 workers for 2 vCPU cores
 AUTO_RESIZE = os.getenv('AUTO_RESIZE', 'true').lower() == 'true'  # Enable intelligent resizing
-MIN_FREE_MEMORY_MB = int(os.getenv('MIN_FREE_MEMORY_MB', '200'))  # Minimum free memory to maintain
+MIN_FREE_MEMORY_MB = int(os.getenv('MIN_FREE_MEMORY_MB', '500'))  # Higher threshold for 4GB system
 
 VIDEO_ALLOWED_EXTENSIONS = {'mp4', 'avi', 'mov', 'mkv', 'wmv', 'flv', 'webm'}
 MAX_VIDEO_MB = int(os.getenv('MAX_VIDEO_MB', '1000'))  # 1GB default
@@ -31,7 +35,7 @@ VIDEO_OUTPUT_ROOT = 'video_outputs'
 
 # Authentication settings
 SECRET_KEY = os.getenv('SECRET_KEY', secrets.token_hex(32))
-USERS_FILE = 'users.json'
+USERS_FILE = os.path.join(DATA_DIR, 'users.json')
 SESSION_TIMEOUT = 3600  # 1 hour
 
 # Video processing limits

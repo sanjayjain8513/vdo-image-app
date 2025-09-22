@@ -1,0 +1,15 @@
+<div class="upload-section">
+  <form method="POST" action="{{ action }}" enctype="multipart/form-data">
+    <div class="mb-3">
+      <input type="file" class="form-control" name="file" multiple>
+    </div>
+    <div class="mb-3">
+      <input type="text" class="form-control" name="remote_url" placeholder="Paste image URL">
+    </div>
+    <div class="mb-3">
+      <input type="text" class="form-control" name="drive_url" placeholder="Google Drive URL">
+    </div>
+    <button type="submit" class="btn btn-primary">Upload</button>
+  </form>
+</div>
+

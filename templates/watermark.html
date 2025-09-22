@@ -205,8 +205,9 @@
           </div>
 
           <div class="text-center mt-4">
-            <button type="submit" class="btn btn-info btn-lg px-5">
-              <i class="fas fa-tag me-2"></i>Add Watermarks
+            <button type="button" class="btn btn-info btn-lg px-5" id="watermarkBtn" onclick="this.disabled=true; this.querySelector('i').className='fas fa-spinner fa-spin me-2'; this.querySelector('span').textContent='Adding Watermarks...'; this.style.backgroundColor='#6c757d'; setTimeout(() => document.getElementById('mainForm').submit(), 100);">
+              <i class="fas fa-tag me-2" id="watermarkIcon"></i>
+              <span id="watermarkBtnText">Add Watermarks</span>
             </button>
           </div>
         </form>
@@ -523,10 +524,44 @@
 </style>
 
 <script>
+// Handle form submission loading state
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.getElementById('mainForm');
+  const watermarkBtn = document.getElementById('watermarkBtn');
+  const watermarkIcon = document.getElementById('watermarkIcon');
+  const watermarkBtnText = document.getElementById('watermarkBtnText');
+
+  if (form && watermarkBtn) {
+    form.addEventListener('submit', function(e) {
+      // Check if files are selected
+      const fileInput = document.getElementById('fileInput');
+      const remoteUrl = document.querySelector('input[name="remote_url"]');
+      const driveUrl = document.querySelector('input[name="drive_url"]');
+
+      const hasFiles = fileInput && fileInput.files && fileInput.files.length > 0;
+      const hasRemoteUrl = remoteUrl && remoteUrl.value.trim() !== '';
+      const hasDriveUrl = driveUrl && driveUrl.value.trim() !== '';
+
+      if (!hasFiles && !hasRemoteUrl && !hasDriveUrl) {
+        e.preventDefault();
+        alert('Please select images to add watermarks or provide a URL.');
+        return false;
+      }
+
+      // Show loading state immediately
+      watermarkBtn.disabled = true;
+      watermarkIcon.className = 'fas fa-spinner fa-spin me-2';
+      watermarkBtnText.textContent = 'Adding Watermarks...';
+      watermarkBtn.classList.add('btn-secondary');
+      watermarkBtn.classList.remove('btn-info');
+    });
+  }
+});
+
 // Download All functionality
 {% if all_downloads and all_downloads|length > 0 %}
 document.getElementById("downloadAll")?.addEventListener("click", function() {
-  const files = {{ all_downloads|tojson }};
+  const files = JSON.parse('{{ all_downloads|tojson|safe }}');
   files.forEach((url, i) => {
     setTimeout(() => {
       const link = document.createElement('a');

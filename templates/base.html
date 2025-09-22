@@ -4,9 +4,9 @@
   <!-- Basic SEO -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>{% block title %}Reduce Image size without losing Quality, resize, watermark|ResizeImages.co.in{% endblock %}</title>
-  <meta name="description" content="{% block description %}Professional image optimization tools: compress images without quality loss, resize by pixels/percentage, convert formats, watermark,blur,crop,merge. {% endblock %}">
-  <meta name="keywords" content="{% block keywords %}image compressor online, photo resizer tool, compress images without quality loss, convert jpg to webp, png to jpg converter, image optimizer, photo compression tool, resize images online,resize for instagram, resize for facebook, resize for youtube, resize for twitter, resize for whatsapp, merge jpeg, jpg-jpg, jpeg merge, batch image processing, watermark photos, crop images online, rotate pictures, blur photos online, optimize images for web, reduce file size, image format converter{% endblock %}">
+  <title>{% block title %}Free Image Tools - Compress, Resize & Optimize Photos{% endblock %}</title>
+  <meta name="description" content="{% block description %}Free image optimization tools! Compress, resize, convert, watermark, crop and edit photos online. No sign-up required - start optimizing images now! {% endblock %}">
+  <meta name="keywords" content="{% block keywords %}image tools, photo editor, image optimizer, online image processing{% endblock %}">
   <link rel="canonical" href="{{ canonical or 'https://resizeimages.co.in' }}{{ request.path }}">
   <meta property="og:title" content="{% block og_title %}Free Image Compressor & Photo Optimizer | Compress, Resize, Convert, Rotate, Crop, Watermark , Merge jpg  Online{% endblock %}">
   <meta property="og:description" content="{% block og_description %}Professional image optimization suite: compress without quality loss, resize for web, convert JPG/PNG/WebP, add watermarks{% endblock %}">
@@ -389,17 +389,21 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
+          <!-- PRIORITY 1: Compress Images - Hero Feature -->
           <li class="nav-item">
-            <a class="nav-link {% if request.endpoint in ['home', 'compress_page', 'compress_route'] %}active{% endif %}" href="/compress">
-              <i class="fas fa-compress me-1"></i>Compress
+            <a class="nav-link {% if request.endpoint in ['home', 'compress_page', 'compress_route'] %}active{% endif %}" href="/compress" title="Compress Images - Reduce file size without quality loss">
+              <i class="fas fa-compress me-1"></i><strong>Compress Images</strong>
             </a>
           </li>
-		   <li class="nav-item">
-            <a class="nav-link {% if 'video' in request.endpoint %}active{% endif %}" href="/video">
-              <i class="fas fa-video me-1"></i>Video
+
+          <!-- PRIORITY 2: Video Compression -->
+          <li class="nav-item">
+            <a class="nav-link {% if 'video' in request.endpoint %}active{% endif %}" href="/video" title="Compress Videos - Reduce MP4, AVI, MOV file sizes">
+              <i class="fas fa-video me-1"></i>Compress Video
             </a>
           </li>
-         
+
+          <!-- PRIORITY 3: Popular Standalone Tools -->
           <li class="nav-item">
             <a class="nav-link {% if 'resize' in request.endpoint %}active{% endif %}" href="/resize">
               <i class="fas fa-expand-arrows-alt me-1"></i>Resize
@@ -410,43 +414,46 @@
               <i class="fas fa-exchange-alt me-1"></i>Convert
             </a>
           </li>
-	   <li class="nav-item">
-            <a class="nav-link {% if 'merge' in request.endpoint %}active{% endif %}" href="/merge">
-		    <i class="fas fa-tint me-1"></i>Merge
+
+          <!-- GROUPED: Other Image Tools -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle {% if request.endpoint in ['crop_page', 'rotate_page', 'merge_page', 'watermark_page', 'blur_page'] %}active{% endif %}"
+               href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <i class="fas fa-tools me-1"></i>More Tools
             </a>
-          </li>
-           <li class="nav-item">
-            <a class="nav-link {% if 'watermark' in request.endpoint %}active{% endif %}" href="/watermark">
-              <i class="fas fa-tint me-1"></i>Watermark
-            </a>
-          </li>
-           <li class="nav-item">
-            <a class="nav-link {% if 'blur' in request.endpoint %}active{% endif %}" href="/blur">
-              <i class="fas fa-eye-slash me-1"></i>Blur
-            </a>
-          </li>
-           <li class="nav-item">
-            <a class="nav-link {% if 'crop' in request.endpoint %}active{% endif %}" href="/crop">
-              <i class="fas fa-crop me-1"></i>Crop
-            </a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item {% if 'crop' in request.endpoint %}active{% endif %}" href="/crop">
+                <i class="fas fa-crop me-2"></i>Crop Images
+              </a></li>
+              <li><a class="dropdown-item {% if 'rotate' in request.endpoint %}active{% endif %}" href="/rotate">
+                <i class="fas fa-redo me-2"></i>Rotate Images
+              </a></li>
+              <li><a class="dropdown-item {% if 'merge' in request.endpoint %}active{% endif %}" href="/merge">
+                <i class="fas fa-object-group me-2"></i>Merge Images
+              </a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><h6 class="dropdown-header">Privacy & Security</h6></li>
+              <li><a class="dropdown-item {% if 'watermark' in request.endpoint %}active{% endif %}" href="/watermark">
+                <i class="fas fa-tint me-2"></i>Add Watermark
+              </a></li>
+              <li><a class="dropdown-item {% if 'blur' in request.endpoint %}active{% endif %}" href="/blur">
+                <i class="fas fa-eye-slash me-2"></i>Blur Faces
+              </a></li>
+            </ul>
           </li>
 
-          <li class="nav-item">
-            <a class="nav-link {% if 'rotate' in request.endpoint %}active{% endif %}" href="/rotate">
-              <i class="fas fa-redo me-1"></i>Rotate
-            </a>
-          </li>
           <li class="nav-item">
             <a class="nav-link" href="/blog">
               <i class="fas fa-blog me-1"></i>Blog
             </a>
           </li>
-           <li class="nav-item">
+          <li class="nav-item">
             <a class="nav-link" href="/contact">
               <i class="fas fa-envelope me-1"></i>Contact
             </a>
           </li>
-		   <!-- Add login/logout section before </ul> -->
+
+          <!-- Add login/logout section before </ul> -->
           <li class="nav-item" id="authSection">
             <!-- This will be populated by JavaScript -->
           </li>
@@ -486,12 +493,11 @@
         </div>
         <div class="col-md-6 text-md-end">
           <div class="mb-2 footer-links">
-            <a href="/compress" class="footer-link me-3">Compress</a>
+            <a href="/compress" class="footer-link me-3" title="Compress Images - Reduce file size"><strong>Compress Images</strong></a>
+            <a href="/video" class="footer-link me-3" title="Compress Videos - Reduce video file sizes"><strong>Compress Video</strong></a>
             <a href="/resize" class="footer-link me-3">Resize</a>
             <a href="/convert" class="footer-link me-3">Convert</a>
-            <a href="/rotate" class="footer-link me-3">Rotate</a>
             <a href="/crop" class="footer-link me-3">Crop</a>
-	    <a href="/merge" class="footer-link me-3">Merge</a>
             <a href="/watermark" class="footer-link me-3">Watermark</a>
             <a href="/blur" class="footer-link me-3">Blur</a>
             <a href="/contact" class="footer-link">Contact</a>

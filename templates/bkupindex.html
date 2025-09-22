@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Basic SEO -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Compress, Resize & Convert Images Online | JPG PNG WebP — ResizeImages.co.in</title>
+  <meta name="description" content="Fast, free online image tools: compress without quality loss, resize by percent or pixels, and convert formats (JPG/PNG/WebP). Drag & drop up to 10 images.">
+  <meta name="keywords" content="image resizer, photo resizer, compress jpg, compress png, convert webp, kompress foto, kompress jpg, reduce image size">
+  <link rel="canonical" href="{{ canonical or 'https://resizeimages.co.in' }}">
+  <meta property="og:title" content="Compress, Resize & Convert Images Online — ResizeImages.co.in">
+  <meta property="og:description" content="Compress without visible quality loss. Resize for web. Convert JPG/PNG/WebP. Drag & drop up to 10 images.">
+  <meta property="og:url" content="{{ canonical or 'https://resizeimages.co.in' }}">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary">
+
+  <!-- JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"WebSite",
+    "name":"ResizeImages.co.in",
+    "url":"{{ canonical or 'https://resizeimages.co.in' }}",
+    "potentialAction":{
+      "@type":"SearchAction",
+      "target":"{{ canonical or 'https://resizeimages.co.in' }}/?q={search_term_string}",
+      "query-input":"required name=search_term_string"
+    }
+  }
+  </script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <style>
+    #dropArea, .dropArea { border: 2px dashed #dfe6ef; padding: 24px; border-radius: 12px; text-align: center; cursor: pointer; background: #fbfdff; }
+    .thumb { max-width: 100px; max-height: 80px; margin: 6px; border-radius:6px; border:1px solid #ddd; padding:2px; background:white; }
+    .uibox { width: 100%; }
+  </style>
+</head>
+<body class="bg-light">
+  <nav class="navbar navbar-expand-lg bg-white shadow-sm">
+    <div class="container">
+      <a class="navbar-brand" href="/">resizeimages.co.in</a>
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link {% if active_tab=='compress' or not active_tab %}fw-bold{% endif %}" href="/">Compress</a></li>
+        <li class="nav-item"><a class="nav-link {% if active_tab=='resize' %}fw-bold{% endif %}" href="#resize" onclick="showTab('resize')">Resize</a></li>
+        <li class="nav-item"><a class="nav-link {% if active_tab=='convert' %}fw-bold{% endif %}" href="#convert" onclick="showTab('convert')">Convert</a></li>
+        <li class="nav-item"><a class="nav-link" href="/blog">Blog</a></li>
+      </ul>
+    </div>
+  </nav>
+
+
+   <div class="container py-4">
+    <div class="hero mb-3">
+      <span class="badge badge-soft me-2">Note</span>
+      <strong>Images are compressed without loss in visible quality.</strong>
+    </div>
+	
+    {% if error %}
+      <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+    <h1 class="h3 mb-3">Free Online Image Tools — Compress, Resize & Convert</h1>
+    <ul class="nav nav-tabs" id="tabs">
+      <li class="nav-item">
+        <button class="nav-link {% if active_tab=='compress' or not active_tab %}active{% endif %}" id="tab-compress" onclick="showTab('compress')">Compress</button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link {% if active_tab=='resize' %}active{% endif %}" id="tab-resize" onclick="showTab('resize')">Resize</button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link {% if active_tab=='convert' %}active{% endif %}" id="tab-convert" onclick="showTab('convert')">Convert</button>
+      </li>
+    </ul>
+
+    <div class="tab-content p-3 bg-white border border-top-0 rounded-bottom shadow-sm">
+      <!-- COMPRESS -->
+      <div id="panel-compress" class="{% if active_tab=='compress' or not active_tab %}d-block{% else %}d-none{% endif %}">
+        <div class="mb-2 text-muted">
+          <strong>Upload constraints:</strong> Max files: <span id="maxFilesDisplay">{{ max_files or 10 }}</span>,
+          Types: jpg, jpeg, png, webp, Max size per file: <span id="maxSizeDisplay">{{ config_max_mb or 10 }}</span> MB
+        </div>
+        <form id="compressForm" action="/compress" method="post" enctype="multipart/form-data">
+          <div id="dropArea" class="uibox">Click or drop images here<br><small class="text-muted">JPEG, PNG, WebP</small></div>
+          <input type="file" id="fileInput" name="images" accept="image/jpeg,image/jpg,image/png,image/webp" multiple style="display:none" required>
+          <div class="row mt-3">
+            <div class="col-md-4">
+              <input class="form-control" type="url" name="remote_url" placeholder="Or paste direct image URL">
+            </div>
+            <div class="col-md-4">
+              <input class="form-control" type="url" name="drive_url" placeholder="Or Google Drive share link (public)">
+            </div>
+            <div class="col-md-4">
+              <button type="submit" class="btn btn-primary w-100">Compress Images</button>
+            </div>
+          </div>
+          <div id="selectionInfo" class="mb-3 mt-3" style="display:none;">
+            <div><strong><span id="fileCount">0</span></strong> file(s) selected</div>
+            <div id="thumbnails" class="d-flex flex-wrap mt-2"></div>
+          </div>
+        </form>
+
+        {% if results %}
+          <div class="d-flex gap-2 mb-3 mt-3">
+            {% if all_downloads and all_downloads|length > 0 %}
+              <button id="downloadAll" class="btn btn-success flex-fill">Download All</button>
+            {% endif %}
+            <a href="/" class="btn btn-secondary flex-fill">New Session</a>
+          </div>
+
+          <ul class="list-group">
+            {% for r in results %}
+              <li class="list-group-item">
+                {% if r.error %}
+                  {{ r.name }} - <span class="text-danger">Error: {{ r.error }}</span>
+                {% else %}
+                  {{ r.name }}<br>
+                  <small>Original: {{ r.original_size }}, New: {{ r.compressed_size }}, Reduction: {{ r.reduction }}</small><br>
+                  <a href="{{ r.download }}" class="btn btn-sm btn-outline-primary mt-1" download>Download</a>
+                {% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+
+          {% if all_downloads and all_downloads|length > 0 %}
+          <script>
+            document.getElementById("downloadAll")?.addEventListener("click", function() {
+              const files = {{ all_downloads|tojson }};
+              files.forEach((url, i) => {
+                setTimeout(() => {
+                  const link = document.createElement('a');
+                  link.href = url;
+                  link.download = '';
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                }, i * 300);
+              });
+            });
+          </script>
+          {% endif %}
+        {% endif %}
+      </div>
+
+      <!-- RESIZE -->
+      <div id="panel-resize" class="{% if active_tab=='resize' %}d-block{% else %}d-none{% endif %}">
+        <div class="mb-2 text-muted">
+          <strong>Upload constraints:</strong> Max files: <span>{{ max_files or 10 }}</span>,
+          Types: jpg, jpeg, png, webp, Max size per file: <span>{{ config_max_mb or 10 }}</span> MB
+        </div>
+        <form id="resizeForm" action="/resize" method="post" enctype="multipart/form-data">
+          <div class="dropArea uibox" id="dropAreaResize">Click or drop images here<br><small class="text-muted">JPEG, PNG, WebP</small></div>
+          <input type="file" id="fileInputResize" name="resize_images" accept="image/jpeg,image/jpg,image/png,image/webp" multiple style="display:none" required>
+          <div class="row mt-3 gy-2">
+            <div class="col-md-3">
+              <select class="form-select" name="resize_mode" id="resizeMode">
+                <option value="percent">By Percentage</option>
+                <option value="fit">Fit within Width × Height</option>
+                <option value="exact">Exact Width × Height</option>
+              </select>
+            </div>
+            <div class="col-md-3"><input class="form-control" name="val1" id="val1" type="number" placeholder="Percent or Width" value="50"></div>
+            <div class="col-md-3"><input class="form-control" name="val2" id="val2" type="number" placeholder="Height (for fit/exact)" value="50"></div>
+            <div class="col-md-3">
+              <button type="submit" class="btn btn-primary w-100">Resize Images</button>
+            </div>
+            <div class="col-md-6">
+              <input class="form-control" type="url" name="resize_remote_url" placeholder="Or paste direct image URL">
+            </div>
+            <div class="col-md-6">
+              <input class="form-control" type="url" name="resize_drive_url" placeholder="Or Google Drive share link (public)">
+            </div>
+          </div>
+          <div id="selectionInfoResize" class="mb-3 mt-3" style="display:none;">
+            <div><strong><span id="fileCountResize">0</span></strong> file(s) selected</div>
+            <div id="thumbnailsResize" class="d-flex flex-wrap mt-2"></div>
+          </div>
+        </form>
+
+        {% if results_resize %}
+          <div class="d-flex gap-2 mb-3 mt-3">
+            {% if all_downloads_resize and all_downloads_resize|length > 0 %}
+              <button id="downloadAllResize" class="btn btn-success flex-fill">Download All</button>
+            {% endif %}
+            <a href="/" class="btn btn-secondary flex-fill">New Session</a>
+          </div>
+
+          <ul class="list-group">
+            {% for r in results_resize %}
+              <li class="list-group-item">
+                {% if r.error %}
+                  {{ r.name }} - <span class="text-danger">Error: {{ r.error }}</span>
+                {% else %}
+                  {{ r.name }}<br>
+                  <a href="{{ r.download }}" class="btn btn-sm btn-outline-primary mt-1" download>Download</a>
+                {% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+
+          {% if all_downloads_resize and all_downloads_resize|length > 0 %}
+          <script>
+            document.getElementById("downloadAllResize")?.addEventListener("click", function() {
+              const files = {{ all_downloads_resize|tojson }};
+              files.forEach((url, i) => {
+                setTimeout(() => {
+                  const link = document.createElement('a');
+                  link.href = url;
+                  link.download = '';
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                }, i * 300);
+              });
+            });
+          </script>
+          {% endif %}
+        {% endif %}
+      </div>
+
+      <!-- CONVERT -->
+      <div id="panel-convert" class="{% if active_tab=='convert' %}d-block{% else %}d-none{% endif %}">
+        <div class="mb-2 text-muted">
+          <strong>Upload constraints:</strong> Max files: <span>{{ max_files or 10 }}</span>,
+          Types: jpg, jpeg, png, webp, Max size per file: <span>{{ config_max_mb or 10 }}</span> MB
+        </div>
+        <form id="convertForm" action="/convert" method="post" enctype="multipart/form-data">
+          <div class="dropArea uibox" id="dropAreaConvert">Click or drop images here<br><small class="text-muted">JPEG, PNG, WebP</small></div>
+          <input type="file" id="fileInputConvert" name="convert_images" accept="image/jpeg,image/jpg,image/png,image/webp" multiple style="display:none" required>
+          <div class="row mt-3 gy-2">
+            <div class="col-md-3">
+              <select class="form-select" name="target_format">
+                <option value="jpg">JPG</option>
+                <option value="png">PNG</option>
+                <option value="webp">WebP</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <button type="submit" class="btn btn-primary w-100">Convert</button>
+            </div>
+            <div class="col-md-3">
+              <input class="form-control" type="url" name="convert_remote_url" placeholder="Or paste direct image URL">
+            </div>
+            <div class="col-md-3">
+              <input class="form-control" type="url" name="convert_drive_url" placeholder="Or Google Drive share link (public)">
+            </div>
+          </div>
+          <div id="selectionInfoConvert" class="mb-3 mt-3" style="display:none;">
+            <div><strong><span id="fileCountConvert">0</span></strong> file(s) selected</div>
+            <div id="thumbnailsConvert" class="d-flex flex-wrap mt-2"></div>
+          </div>
+        </form>
+
+        {% if results_convert %}
+          <div class="d-flex gap-2 mb-3 mt-3">
+            {% if all_downloads_convert and all_downloads_convert|length > 0 %}
+              <button id="downloadAllConvert" class="btn btn-success flex-fill">Download All</button>
+            {% endif %}
+            <a href="/" class="btn btn-secondary flex-fill">New Session</a>
+          </div>
+
+          <ul class="list-group">
+            {% for r in results_convert %}
+              <li class="list-group-item">
+                {% if r.error %}
+                  {{ r.name }} - <span class="text-danger">Error: {{ r.error }}</span>
+                {% else %}
+                  {{ r.name }}<br>
+                  <a href="{{ r.download }}" class="btn btn-sm btn-outline-primary mt-1" download>Download</a>
+                {% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+
+          {% if all_downloads_convert and all_downloads_convert|length > 0 %}
+          <script>
+            document.getElementById("downloadAllConvert")?.addEventListener("click", function() {
+              const files = {{ all_downloads_convert|tojson }};
+              files.forEach((url, i) => {
+                setTimeout(() => {
+                  const link = document.createElement('a');
+                  link.href = url;
+                  link.download = '';
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                }, i * 300);
+              });
+            });
+          </script>
+          {% endif %}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function showTab(name) {
+      const panels = ['compress','resize','convert'];
+      panels.forEach(p => {
+        document.getElementById('panel-'+p).className = (p===name)?'d-block':'d-none';
+        document.getElementById('tab-'+p).className = 'nav-link ' + ((p===name)?'active':'');
+      });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    const MAX_FILES = {{ max_files or 10 }};
+    const MAX_FILE_MB = {{ config_max_mb or 10 }};
+
+    function hookUpload(dropId, inputId, countId, thumbsId) {
+      const drop = document.getElementById(dropId);
+      const input = document.getElementById(inputId);
+      const count = document.getElementById(countId);
+      const thumbs = document.getElementById(thumbsId);
+      const infoBox = document.getElementById(countId).closest('div').parentElement;
+
+      function show(files){
+        const list = Array.from(files).slice(0, MAX_FILES);
+        infoBox.style.display='block';
+        count.textContent = list.length;
+        thumbs.innerHTML = '';
+        let valid = true;
+
+        list.forEach(file => {
+          const sizeMB = file.size/(1024*1024);
+          if (sizeMB > MAX_FILE_MB) valid = false;
+          if (file.size <= 1024*1024) {
+            const img = document.createElement('img');
+            img.className = 'thumb';
+            img.alt = file.name;
+            const reader = new FileReader();
+            reader.onload = (e) => { img.src = e.target.result; };
+            reader.readAsDataURL(file);
+            thumbs.appendChild(img);
+          } else {
+            const span = document.createElement('div');
+            span.className = 'small text-muted';
+            span.textContent = file.name + ' (' + (file.size/1024).toFixed(0) + ' KB)';
+            thumbs.appendChild(span);
+          }
+        });
+
+        if (files.length > MAX_FILES) valid = false;
+        if (!valid) { alert('Selection invalid: too many files or file too large.'); }
+      }
+
+      drop.addEventListener('click', ()=> input.click());
+      drop.addEventListener('dragover', (e)=> { e.preventDefault(); drop.style.borderColor='#0b74de'; });
+      drop.addEventListener('dragleave', ()=> { drop.style.borderColor=''; });
+      drop.addEventListener('drop', (e)=> {
+        e.preventDefault();
+        input.files = e.dataTransfer.files;
+        show(input.files);
+      });
+      input.addEventListener('change', ()=> show(input.files));
+    }
+
+    hookUpload('dropArea','fileInput','fileCount','thumbnails');
+    hookUpload('dropAreaResize','fileInputResize','fileCountResize','thumbnailsResize');
+    hookUpload('dropAreaConvert','fileInputConvert','fileCountConvert','thumbnailsConvert');
+  </script>
+</body>
+</html>
